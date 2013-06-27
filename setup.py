@@ -3,8 +3,12 @@ import os
 from setuptools import setup
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.rst')).read()
-NEWS = open(os.path.join(here, 'NEWS.txt')).read()
+
+with open(os.path.join(here, 'README.rst')) as _readme:
+    README = _readme.read()
+
+with open(os.path.join(here, 'NEWS.txt')) as _news:
+    NEWS = _news.read()
 
 version = '0.1.1'
 
