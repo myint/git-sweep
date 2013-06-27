@@ -5,17 +5,15 @@ from .base import BaseOperation
 
 class Inspector(BaseOperation):
 
-    """
-    Used to introspect a Git repository.
+    """Used to introspect a Git repository."""
 
-    """
     def merged_refs(self, skip=[]):
-        """
-        Returns a list of remote refs that have been merged into the master
+        """Returns a list of remote refs that have been merged into the master
         branch.
 
         The "master" branch may have a different name than master. The value of
         ``self.master_name`` is used to determine what this name is.
+
         """
         origin = self._origin
 

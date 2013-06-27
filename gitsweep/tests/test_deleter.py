@@ -1,13 +1,11 @@
 from gitsweep.tests.testcases import (GitSweepTestCase, InspectorTestCase,
-    DeleterTestCase)
+                                      DeleterTestCase)
 
 
 class TestDeleter(GitSweepTestCase, InspectorTestCase, DeleterTestCase):
 
-    """
-    Can delete remote refs from a remote.
+    """Can delete remote refs from a remote."""
 
-    """
     def setUp(self):
         super(TestDeleter, self).setUp()
 
@@ -19,12 +17,12 @@ class TestDeleter(GitSweepTestCase, InspectorTestCase, DeleterTestCase):
             self.command('git merge branch{0}'.format(i))
 
     def test_will_delete_merged_from_clone(self):
-        """
-        Given a list of refs, will delete them from cloned repo.
+        """Given a list of refs, will delete them from cloned repo.
 
         This test looks at our cloned repository, the one which is setup to
         track the remote and makes sure that the changes occur on it as
         expected.
+
         """
         clone = self.remote.remotes[0]
 
@@ -41,15 +39,13 @@ class TestDeleter(GitSweepTestCase, InspectorTestCase, DeleterTestCase):
         self.assertEqual(5, len(pushes))
 
         # Grab all the remote branches again
-        after = [i.remote_head for i in clone.refs]
-        after.sort()
+        after = sorted([i.remote_head for i in clone.refs])
 
         # We should be down to 2, HEAD and master
         self.assertEqual(['HEAD', 'master'], after)
 
     def test_will_delete_merged_on_remote(self):
-        """
-        With the list of refs, will delete these from the remote.
+        """With the list of refs, will delete these from the remote.
 
         This test makes assertion against the remote, not the clone repository.
         We are testing to see if the interactions in the cloned repo are pushed
@@ -57,6 +53,7 @@ class TestDeleter(GitSweepTestCase, InspectorTestCase, DeleterTestCase):
 
         Note that accessing the repository directly does not include the
         symbolic reference of HEAD.
+
         """
         remote = self.repo
 

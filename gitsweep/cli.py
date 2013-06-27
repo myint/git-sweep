@@ -11,17 +11,14 @@ from gitsweep.deleter import Deleter
 
 class CommandLine(object):
 
-    """
-    Main interface to the command-line for running git-sweep.
-
-    """
+    """Main interface to the command-line for running git-sweep."""
     parser = ArgumentParser(
         description='Clean up your Git remote branches.',
         usage='git-sweep <action> [-h]',
-        )
+    )
 
     _sub_parsers = parser.add_subparsers(title='action',
-        description='Preview changes or perform clean up')
+                                         description='Preview changes or perform clean up')
 
     _origin_kwargs = {
         'help': 'The name of the remote you wish to clean up',
@@ -50,8 +47,8 @@ class CommandLine(object):
         '''.strip())
 
     _preview = _sub_parsers.add_parser('preview',
-        help='Preview the branches that will be deleted',
-        usage=_preview_usage)
+                                       help='Preview the branches that will be deleted',
+                                       usage=_preview_usage)
     _preview.add_argument('--origin', **_origin_kwargs)
     _preview.add_argument('--master', **_master_kwargs)
     _preview.add_argument('--nofetch', **_no_fetch_kwargs)
@@ -64,10 +61,10 @@ class CommandLine(object):
         '''.strip())
 
     _cleanup = _sub_parsers.add_parser('cleanup',
-        help='Delete merged branches from the remote',
-        usage=_cleanup_usage)
+                                       help='Delete merged branches from the remote',
+                                       usage=_cleanup_usage)
     _cleanup.add_argument('--force', action='store_true', default=False,
-        dest='force', help='Do not ask, cleanup immediately')
+                          dest='force', help='Do not ask, cleanup immediately')
     _cleanup.add_argument('--origin', **_origin_kwargs)
     _cleanup.add_argument('--master', **_master_kwargs)
     _cleanup.add_argument('--nofetch', **_no_fetch_kwargs)
@@ -78,9 +75,7 @@ class CommandLine(object):
         self.args = args[1:]
 
     def run(self):
-        """
-        Runs git-sweep.
-        """
+        """Runs git-sweep."""
         try:
             if not self.args:
                 self.parser.print_help()
@@ -97,9 +92,7 @@ class CommandLine(object):
         sys.exit(1)
 
     def _sweep(self):
-        """
-        Runs git-sweep.
-        """
+        """Runs git-sweep."""
         args = self.parser.parse_args(self.args)
 
         dry_run = True if args.action == 'preview' else False
@@ -122,7 +115,7 @@ class CommandLine(object):
 
         # Find branches that could be merged
         inspector = Inspector(repo, remote_name=remote_name,
-            master_branch=master_branch)
+                              master_branch=master_branch)
         ok_to_delete = inspector.merged_refs(skip=skips)
 
         if ok_to_delete:
@@ -131,14 +124,14 @@ class CommandLine(object):
                     master_branch))
         else:
             sys.stdout.write('No remote branches are available for '
-                'cleaning up\n')
+                             'cleaning up\n')
 
         for ref in ok_to_delete:
             sys.stdout.write('  {0}\n'.format(ref.remote_head))
 
         if not dry_run:
             deleter = Deleter(repo, remote_name=remote_name,
-                master_branch=master_branch)
+                              master_branch=master_branch)
 
             if not args.force:
                 sys.stdout.write('\nDelete these branches? (y/n) ')
@@ -152,7 +145,7 @@ class CommandLine(object):
 
                 sys.stdout.write('\nAll done!\n')
                 sys.stdout.write('\nTell everyone to run `git fetch --prune` '
-                    'to sync with this remote.\n')
+                                 'to sync with this remote.\n')
                 sys.stdout.write('(you don\'t have to, yours is synced)\n')
             else:
                 sys.stdout.write('\nOK, aborting.\n')

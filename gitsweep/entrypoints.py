@@ -1,7 +1,5 @@
 def main():
-    """
-    Command-line interface.
-    """
+    """Command-line interface."""
     import sys
 
     from gitsweep.cli import CommandLine
@@ -10,9 +8,7 @@ def main():
 
 
 def test():
-    """
-    Run git-sweep's test suite.
-    """
+    """Run git-sweep's test suite."""
     import nose
 
     import sys

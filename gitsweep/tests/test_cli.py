@@ -5,14 +5,10 @@ from gitsweep.tests.testcases import CommandTestCase
 
 class TestHelpMenu(CommandTestCase):
 
-    """
-    Command-line tool can show the help menu.
+    """Command-line tool can show the help menu."""
 
-    """
     def test_help(self):
-        """
-        If no arguments are given the help menu is displayed.
-        """
+        """If no arguments are given the help menu is displayed."""
         (retcode, stdout, stderr) = self.gscommand('git-sweep -h')
 
         self.assertResults('''
@@ -32,9 +28,7 @@ class TestHelpMenu(CommandTestCase):
             ''', stdout)
 
     def test_fetch(self):
-        """
-        Will fetch if told not to.
-        """
+        """Will fetch if told not to."""
         (retcode, stdout, stderr) = self.gscommand('git-sweep preview')
 
         self.assertResults('''
@@ -43,9 +37,7 @@ class TestHelpMenu(CommandTestCase):
             ''', stdout)
 
     def test_no_fetch(self):
-        """
-        Will not fetch if told not to.
-        """
+        """Will not fetch if told not to."""
         (retcode, stdout, stderr) = self.gscommand(
             'git-sweep preview --nofetch')
 
@@ -54,9 +46,7 @@ class TestHelpMenu(CommandTestCase):
             ''', stdout)
 
     def test_will_preview(self):
-        """
-        Will preview the proposed deletes.
-        """
+        """Will preview the proposed deletes."""
         for i in range(1, 6):
             self.command('git checkout -b branch{0}'.format(i))
             self.make_commit()
@@ -80,9 +70,8 @@ class TestHelpMenu(CommandTestCase):
             ''', stdout)
 
     def test_will_preserve_arguments(self):
-        """
-        The recommended cleanup command contains the same arguments given.
-        """
+        """The recommended cleanup command contains the same arguments
+        given."""
         for i in range(1, 6):
             self.command('git checkout -b branch{0}'.format(i))
             self.make_commit()
@@ -109,9 +98,7 @@ class TestHelpMenu(CommandTestCase):
             '''.format(cleanup), stdout)
 
     def test_will_preview_none_found(self):
-        """
-        Will preview the proposed deletes.
-        """
+        """Will preview the proposed deletes."""
         for i in range(1, 6):
             self.command('git checkout -b branch{0}'.format(i))
             self.make_commit()
@@ -125,9 +112,7 @@ class TestHelpMenu(CommandTestCase):
             ''', stdout)
 
     def test_will_cleanup(self):
-        """
-        Will preview the proposed deletes.
-        """
+        """Will preview the proposed deletes."""
         for i in range(1, 6):
             self.command('git checkout -b branch{0}'.format(i))
             self.make_commit()
@@ -163,9 +148,7 @@ class TestHelpMenu(CommandTestCase):
             ''', stdout)
 
     def test_will_abort_cleanup(self):
-        """
-        Will preview the proposed deletes.
-        """
+        """Will preview the proposed deletes."""
         for i in range(1, 6):
             self.command('git checkout -b branch{0}'.format(i))
             self.make_commit()
@@ -192,9 +175,7 @@ class TestHelpMenu(CommandTestCase):
             ''', stdout)
 
     def test_will_skip_certain_branches(self):
-        """
-        Can be forced to skip certain branches.
-        """
+        """Can be forced to skip certain branches."""
         for i in range(1, 6):
             self.command('git checkout -b branch{0}'.format(i))
             self.make_commit()
@@ -219,9 +200,7 @@ class TestHelpMenu(CommandTestCase):
             '''.format(cleanup), stdout)
 
     def test_will_force_clean(self):
-        """
-        Will cleanup immediately if forced.
-        """
+        """Will cleanup immediately if forced."""
         for i in range(1, 6):
             self.command('git checkout -b branch{0}'.format(i))
             self.make_commit()
