@@ -5,6 +5,7 @@ python:
     - "2.7"
 
 install:
+    - if [ "$TRAVIS_PYTHON_VERSION" == "2.6" ]; then pip --quiet install argparse; fi
     - pip --quiet install nose mock
     - python setup.py --quiet install
 
