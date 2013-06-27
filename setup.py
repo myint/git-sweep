@@ -1,6 +1,6 @@
 import sys
 import os
-from setuptools import setup, find_packages
+from setuptools import setup
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
@@ -37,8 +37,7 @@ setup(name='git-sweep',
     author_email='',
     url='http://arc90.com',
     license='MIT',
-    packages=find_packages('src'),
-    package_dir = {'': 'src'},
+    packages=['gitsweep'],
     include_package_data=True,
     zip_safe=False,
     install_requires=install_requires,
