@@ -4,7 +4,6 @@ class MissingRemote(Exception):
     Raise when a remote by name is not found.
 
     """
-    pass
 
 
 class MissingMasterBranch(Exception):
@@ -13,7 +12,6 @@ class MissingMasterBranch(Exception):
     Raise when the "master" branch cannot be located.
 
     """
-    pass
 
 
 class BaseOperation(object):
