@@ -6,7 +6,7 @@ python:
 
 install:
     - if [ "$TRAVIS_PYTHON_VERSION" == "2.6" ]; then pip --quiet install argparse; fi
-    - pip --quiet install nose mock
+    - pip --quiet install GitPython mock nose
     - python setup.py --quiet install
 
 before_script:
