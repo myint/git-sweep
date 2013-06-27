@@ -125,6 +125,7 @@ class CommandLine(object):
         else:
             sys.stdout.write('No remote branches are available for '
                              'cleaning up\n')
+            return
 
         for ref in ok_to_delete:
             sys.stdout.write('  {0}\n'.format(ref.remote_head))
