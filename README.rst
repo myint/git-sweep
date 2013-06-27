@@ -1,6 +1,10 @@
 git-sweep
 =========
 
+.. image:: https://travis-ci.org/myint/git-sweep.png?branch=master
+   :target: https://travis-ci.org/myint/git-sweep
+   :alt: Build status
+
 A command-line tool that helps you clean up Git branches that have been merged
 into master.
 
