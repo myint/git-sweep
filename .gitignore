@@ -13,3 +13,4 @@ dist
 eggs
 parts
 .tox
+.travis-solo/
