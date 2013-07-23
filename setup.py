@@ -10,7 +10,7 @@ with open(os.path.join(here, 'README.rst')) as _readme:
 with open(os.path.join(here, 'NEWS.txt')) as _news:
     NEWS = _news.read()
 
-version = '0.1.1'
+version = '0.2'
 
 install_requires = [
     'GitPython>=0.3.2RC1']
