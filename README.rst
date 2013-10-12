@@ -155,22 +155,6 @@ immediately.
 Development
 -----------
 
-git-sweep uses `git-flow`_ for development and release cylces. If you want to
-hack on this with us, fork the project and put a pull request into the
-``develop`` branch when you get done.
-
-To run the tests, bootstrap Buildout and run this command:
-
-::
-
-    $ git clone http://github.com/arc90/git-sweep.git
-    $ cd git-sweep
-    $ python2.7 bootstrap.py
-    ...
-    $ ./bin/buildout
-    ...
-    $ ./bin/test
-
 We also use Tox_. It will run the tests for Python 2.6 and 2.7.
 
 ::
@@ -188,6 +172,4 @@ License
 
 Friendly neighborhood MIT license.
 
-.. _GitHub Flow: http://scottchacon.com/2011/08/31/github-flow.html
-.. _git-flow: http://nvie.com/posts/a-successful-git-branching-model/
 .. _Tox: http://pypi.python.org/pypi/tox
