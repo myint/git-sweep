@@ -17,8 +17,7 @@ version = '0.2'
 install_requires = [
     'GitPython>=0.3.2RC1']
 
-# Add argparse if less than Python 2.7
-if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
+if sys.version_info < (2, 7):
     install_requires.append('argparse>=1.2.1')
 
 setup(name='git-sweep',
