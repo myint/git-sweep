@@ -13,7 +13,7 @@ class CommandLine(object):
     """Main interface to the command-line for running git-sweep."""
     parser = ArgumentParser(
         description='Clean up your Git remote branches.',
-        usage='git-sweep <action> [-h]',
+        prog='git-sweep'
     )
 
     _origin_kwargs = {
