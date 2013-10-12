@@ -6,7 +6,7 @@ from unittest import TestCase
 from uuid import uuid4 as uuid
 from shutil import rmtree
 from shlex import split
-from contextlib import contextmanager, nested
+from contextlib import nested
 from textwrap import dedent
 
 from mock import patch
@@ -16,27 +16,6 @@ from git.cmd import Git
 from gitsweep import cli
 from gitsweep.inspector import Inspector
 from gitsweep.deleter import Deleter
-
-
-@contextmanager
-def cwd_bounce(dir):
-    """Temporarily changes to a directory and changes back in the end.
-
-    Where ``dir`` is the directory you wish to change to. When the context
-    manager exits it will change back to the original working directory.
-
-    Context manager will yield the original working directory and make that
-    available to the context manager's assignment target.
-
-    """
-    original_dir = getcwd()
-
-    try:
-        chdir(dir)
-
-        yield original_dir
-    finally:
-        chdir(original_dir)
 
 
 class GitSweepTestCase(TestCase):
@@ -118,15 +97,6 @@ class GitSweepTestCase(TestCase):
         self._remote.remotes[0].pull()
         return self._remote
 
-    def graph(self):
-        """Prints a graph of the git log.
-
-        This is used for testing and debugging only.
-
-        """
-        sys.stdout.write(Git(self.repodir).execute(
-            ['git', 'log', '--graph', '--oneline']))
-
     def make_commit(self):
         """Makes a random commit in the current branch."""
         fragment = uuid().hex[:8]
@@ -195,7 +165,6 @@ class CommandTestCase(GitSweepTestCase, InspectorTestCase, DeleterTestCase):
     def setUp(self):
         super(CommandTestCase, self).setUp()
 
-        self._commandline = None
         self._original_dir = getcwd()
 
         # Change the working directory to our clone
@@ -204,14 +173,6 @@ class CommandTestCase(GitSweepTestCase, InspectorTestCase, DeleterTestCase):
     def tearDown(self):
         """Change back to the original directory."""
         chdir(self._original_dir)
-
-    @property
-    def cli(self):
-        """Return and optionally create a CommandLine object."""
-        if not self._commandline:
-            self._commandline = cli.run([''])
-
-        return self._commandline
 
     def gscommand(self, command):
         """Runs the command with the given args."""
