@@ -17,8 +17,9 @@ class CommandLine(object):
         usage='git-sweep <action> [-h]',
     )
 
-    _sub_parsers = parser.add_subparsers(title='action',
-                                         description='Preview changes or perform clean up')
+    _sub_parsers = parser.add_subparsers(
+        title='action',
+        description='Preview changes or perform clean up')
 
     _origin_kwargs = {
         'help': 'The name of the remote you wish to clean up',
@@ -46,9 +47,10 @@ class CommandLine(object):
                               [--master MASTER] [--origin ORIGIN]
         '''.strip())
 
-    _preview = _sub_parsers.add_parser('preview',
-                                       help='Preview the branches that will be deleted',
-                                       usage=_preview_usage)
+    _preview = _sub_parsers.add_parser(
+        'preview',
+        help='Preview the branches that will be deleted',
+        usage=_preview_usage)
     _preview.add_argument('--origin', **_origin_kwargs)
     _preview.add_argument('--master', **_master_kwargs)
     _preview.add_argument('--nofetch', **_no_fetch_kwargs)
@@ -60,9 +62,10 @@ class CommandLine(object):
                               [--master MASTER] [--origin ORIGIN]
         '''.strip())
 
-    _cleanup = _sub_parsers.add_parser('cleanup',
-                                       help='Delete merged branches from the remote',
-                                       usage=_cleanup_usage)
+    _cleanup = _sub_parsers.add_parser(
+        'cleanup',
+        help='Delete merged branches from the remote',
+        usage=_cleanup_usage)
     _cleanup.add_argument('--force', action='store_true', default=False,
                           dest='force', help='Do not ask, cleanup immediately')
     _cleanup.add_argument('--origin', **_origin_kwargs)
