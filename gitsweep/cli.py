@@ -72,7 +72,7 @@ def _sweep(argv):
                 sys.stdout.write(' (done)\n')
 
             sys.stdout.write('\nAll done!\n')
-            sys.stdout.write('\nTell everyone to run `git fetch --prune` '
+            sys.stdout.write("\nTell everyone to run 'git fetch --prune' "
                              'to sync with this remote.\n')
             sys.stdout.write('(you don\'t have to, yours is synced)\n')
         else:

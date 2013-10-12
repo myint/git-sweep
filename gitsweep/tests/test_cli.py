@@ -128,7 +128,7 @@ class TestHelpMenu(CommandTestCase):
 
             All done!
 
-            Tell everyone to run `git fetch --prune` to sync with this remote.
+            Tell everyone to run 'git fetch --prune' to sync with this remote.
             (you don't have to, yours is synced)
             """, stdout)
 
@@ -213,6 +213,6 @@ class TestHelpMenu(CommandTestCase):
 
             All done!
 
-            Tell everyone to run `git fetch --prune` to sync with this remote.
+            Tell everyone to run 'git fetch --prune' to sync with this remote.
             (you don't have to, yours is synced)
             """, stdout)
