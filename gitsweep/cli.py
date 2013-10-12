@@ -17,28 +17,28 @@ class CommandLine(object):
     )
 
     _origin_kwargs = {
-        'help': 'The name of the remote you wish to clean up',
+        'help': 'name of the remote you wish to clean up',
         'dest': 'origin',
         'default': 'origin'}
 
     _master_kwargs = {
-        'help': 'The name of what you consider the master branch',
+        'help': 'name of what you consider the master branch',
         'dest': 'master',
         'default': 'master'}
 
     _skip_kwargs = {
-        'help': 'Comma-separated list of branches to skip',
+        'help': 'comma-separated list of branches to skip',
         'dest': 'skips',
         'default': ''}
 
     _no_fetch_kwargs = {
-        'help': 'Do not fetch from the remote',
+        'help': 'do not fetch from the remote',
         'dest': 'fetch',
         'action': 'store_false',
         'default': True}
 
     parser.add_argument('--force', action='store_true', default=False,
-                        dest='force', help='Do not ask, cleanup immediately')
+                        dest='force', help='do not ask, cleanup immediately')
     parser.add_argument('--origin', **_origin_kwargs)
     parser.add_argument('--master', **_master_kwargs)
     parser.add_argument('--nofetch', **_no_fetch_kwargs)
