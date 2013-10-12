@@ -16,19 +16,19 @@ class TestHelpMenu(CommandTestCase):
         """Will fetch if told not to."""
         (retcode, stdout, stderr) = self.gscommand('git-sweep --dry-run')
 
-        self.assertResults('''
+        self.assertResults("""
             Fetching from the remote
             No remote branches are available for cleaning up
-            ''', stdout)
+            """, stdout)
 
     def test_no_fetch(self):
         """Will not fetch if told not to."""
         (retcode, stdout, stderr) = self.gscommand(
             'git-sweep --dry-run --no-fetch')
 
-        self.assertResults('''
+        self.assertResults("""
             No remote branches are available for cleaning up
-            ''', stdout)
+            """, stdout)
 
     def test_will_preview(self):
         """Will preview the proposed deletes."""
@@ -41,7 +41,7 @@ class TestHelpMenu(CommandTestCase):
 
         (retcode, stdout, stderr) = self.gscommand('git-sweep --dry-run')
 
-        self.assertResults('''
+        self.assertResults("""
             Fetching from the remote
             These branches have been merged into master:
 
@@ -52,7 +52,7 @@ class TestHelpMenu(CommandTestCase):
               branch5
 
             To delete them, run again without --dry-run
-            ''', stdout)
+            """, stdout)
 
     def test_will_preserve_arguments(self):
         """The recommended cleanup command contains the same arguments
@@ -69,7 +69,7 @@ class TestHelpMenu(CommandTestCase):
 
         (retcode, stdout, stderr) = self.gscommand(preview)
 
-        self.assertResults('''
+        self.assertResults("""
             Fetching from the remote
             These branches have been merged into master:
 
@@ -80,7 +80,7 @@ class TestHelpMenu(CommandTestCase):
               branch5
 
             To delete them, run again without --dry-run
-            '''.format(cleanup), stdout)
+            """.format(cleanup), stdout)
 
     def test_will_preview_none_found(self):
         """Will preview the proposed deletes."""
@@ -91,10 +91,10 @@ class TestHelpMenu(CommandTestCase):
 
         (retcode, stdout, stderr) = self.gscommand('git-sweep --dry-run')
 
-        self.assertResults('''
+        self.assertResults("""
             Fetching from the remote
             No remote branches are available for cleaning up
-            ''', stdout)
+            """, stdout)
 
     def test_will_cleanup(self):
         """Will preview the proposed deletes."""
@@ -109,7 +109,7 @@ class TestHelpMenu(CommandTestCase):
             ri.return_value = 'y'
             (retcode, stdout, stderr) = self.gscommand('git-sweep')
 
-        self.assertResults('''
+        self.assertResults("""
             Fetching from the remote
             These branches have been merged into master:
 
@@ -119,7 +119,7 @@ class TestHelpMenu(CommandTestCase):
               branch4
               branch5
 
-            Delete these branches? (y/n) 
+            Delete these branches? (y/n) """ + """
               deleting branch1 (done)
               deleting branch2 (done)
               deleting branch3 (done)
@@ -130,7 +130,7 @@ class TestHelpMenu(CommandTestCase):
 
             Tell everyone to run `git fetch --prune` to sync with this remote.
             (you don't have to, yours is synced)
-            ''', stdout)
+            """, stdout)
 
     def test_will_abort_cleanup(self):
         """Will preview the proposed deletes."""
@@ -145,7 +145,7 @@ class TestHelpMenu(CommandTestCase):
             ri.return_value = 'n'
             (retcode, stdout, stderr) = self.gscommand('git-sweep')
 
-        self.assertResults('''
+        self.assertResults("""
             Fetching from the remote
             These branches have been merged into master:
 
@@ -155,9 +155,9 @@ class TestHelpMenu(CommandTestCase):
               branch4
               branch5
 
-            Delete these branches? (y/n) 
+            Delete these branches? (y/n) """ + """
             OK, aborting.
-            ''', stdout)
+            """, stdout)
 
     def test_will_skip_certain_branches(self):
         """Can be forced to skip certain branches."""
@@ -173,7 +173,7 @@ class TestHelpMenu(CommandTestCase):
 
         cleanup = 'git-sweep --skip=branch1,branch2'
 
-        self.assertResults('''
+        self.assertResults("""
             Fetching from the remote
             These branches have been merged into master:
 
@@ -182,7 +182,7 @@ class TestHelpMenu(CommandTestCase):
               branch5
 
             To delete them, run again without --dry-run
-            '''.format(cleanup), stdout)
+            """.format(cleanup), stdout)
 
     def test_will_force_clean(self):
         """Will cleanup immediately if forced."""
@@ -195,7 +195,7 @@ class TestHelpMenu(CommandTestCase):
 
         (retcode, stdout, stderr) = self.gscommand('git-sweep --force')
 
-        self.assertResults('''
+        self.assertResults("""
             Fetching from the remote
             These branches have been merged into master:
 
@@ -215,4 +215,4 @@ class TestHelpMenu(CommandTestCase):
 
             Tell everyone to run `git fetch --prune` to sync with this remote.
             (you don't have to, yours is synced)
-            ''', stdout)
+            """, stdout)
