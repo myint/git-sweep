@@ -11,40 +11,6 @@ from gitsweep.deleter import Deleter
 class CommandLine(object):
 
     """Main interface to the command-line for running git-sweep."""
-    parser = ArgumentParser(
-        description='Clean up your Git remote branches.',
-        prog='git-sweep'
-    )
-
-    _origin_kwargs = {
-        'help': 'name of the remote you wish to clean up',
-        'dest': 'origin',
-        'default': 'origin'}
-
-    _master_kwargs = {
-        'help': 'name of what you consider the master branch',
-        'dest': 'master',
-        'default': 'master'}
-
-    _skip_kwargs = {
-        'help': 'comma-separated list of branches to skip',
-        'dest': 'skips',
-        'default': ''}
-
-    _no_fetch_kwargs = {
-        'help': 'do not fetch from the remote',
-        'dest': 'fetch',
-        'action': 'store_false',
-        'default': True}
-
-    parser.add_argument('--force', action='store_true', default=False,
-                        dest='force', help='do not ask, cleanup immediately')
-    parser.add_argument('--origin', **_origin_kwargs)
-    parser.add_argument('--master', **_master_kwargs)
-    parser.add_argument('--no-fetch', **_no_fetch_kwargs)
-    parser.add_argument('--skip', **_skip_kwargs)
-    parser.add_argument('--dry-run', action='store_true',
-                        help='show what would be swept')
 
     def __init__(self, args):
         self.args = args[1:]
@@ -61,7 +27,7 @@ class CommandLine(object):
 
     def _sweep(self):
         """Runs git-sweep."""
-        args = self.parser.parse_args(self.args)
+        args = parse_args(self.args)
 
         fetch = args.fetch
         skips = [i.strip() for i in args.skips.split(',')]
@@ -119,3 +85,43 @@ class CommandLine(object):
                 sys.stdout.write('\nOK, aborting.\n')
         elif ok_to_delete:
             sys.stdout.write('\nTo delete them, run again without --dry-run\n')
+
+
+def parse_args(args):
+    """Return parsed arguments."""
+    parser = ArgumentParser(
+        description='Clean up your Git remote branches.',
+        prog='git-sweep'
+    )
+
+    _origin_kwargs = {
+        'help': 'name of the remote you wish to clean up',
+        'dest': 'origin',
+        'default': 'origin'}
+
+    _master_kwargs = {
+        'help': 'name of what you consider the master branch',
+        'dest': 'master',
+        'default': 'master'}
+
+    _skip_kwargs = {
+        'help': 'comma-separated list of branches to skip',
+        'dest': 'skips',
+        'default': ''}
+
+    _no_fetch_kwargs = {
+        'help': 'do not fetch from the remote',
+        'dest': 'fetch',
+        'action': 'store_false',
+        'default': True}
+
+    parser.add_argument('--force', action='store_true', default=False,
+                        dest='force', help='do not ask, cleanup immediately')
+    parser.add_argument('--origin', **_origin_kwargs)
+    parser.add_argument('--master', **_master_kwargs)
+    parser.add_argument('--no-fetch', **_no_fetch_kwargs)
+    parser.add_argument('--skip', **_skip_kwargs)
+    parser.add_argument('--dry-run', action='store_true',
+                        help='show what would be swept')
+
+    return parser.parse_args(args)
