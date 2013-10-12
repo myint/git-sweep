@@ -1,16 +1,14 @@
+import sys
+
+from gitsweep import cli
+
+
 def main():
     """Command-line interface."""
-    import sys
-
-    from gitsweep.cli import CommandLine
-
-    return CommandLine(sys.argv).run()
+    return cli.run(sys.argv)
 
 
 def test():
     """Run git-sweep's test suite."""
     import nose
-
-    import sys
-
     nose.main(argv=['nose'] + sys.argv[1:])

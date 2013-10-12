@@ -8,83 +8,76 @@ from gitsweep.inspector import Inspector
 from gitsweep.deleter import Deleter
 
 
-class CommandLine(object):
+def run(argv):
+    """Runs git-sweep."""
+    try:
+        _sweep(argv)
+        sys.exit(0)
+    except InvalidGitRepositoryError:
+        sys.stderr.write('This is not a Git repository\n')
 
-    """Main interface to the command-line for running git-sweep."""
+    sys.exit(1)
 
-    def __init__(self, args):
-        self.args = args[1:]
+def _sweep(argv):
+    """Runs git-sweep."""
+    args = parse_args(argv[1:])
 
-    def run(self):
-        """Runs git-sweep."""
-        try:
-            self._sweep()
-            sys.exit(0)
-        except InvalidGitRepositoryError:
-            sys.stderr.write('This is not a Git repository\n')
+    fetch = args.fetch
+    skips = [i.strip() for i in args.skips.split(',')]
 
-        sys.exit(1)
+    # Is this a Git repository?
+    repo = Repo(getcwd())
 
-    def _sweep(self):
-        """Runs git-sweep."""
-        args = parse_args(self.args)
+    remote_name = args.origin
 
-        fetch = args.fetch
-        skips = [i.strip() for i in args.skips.split(',')]
+    # Fetch from the remote so that we have the latest commits
+    if fetch:
+        for remote in repo.remotes:
+            if remote.name == remote_name:
+                sys.stdout.write('Fetching from the remote\n')
+                remote.fetch()
 
-        # Is this a Git repository?
-        repo = Repo(getcwd())
+    master_branch = args.master
 
-        remote_name = args.origin
+    # Find branches that could be merged
+    inspector = Inspector(repo, remote_name=remote_name,
+                          master_branch=master_branch)
+    ok_to_delete = inspector.merged_refs(skip=skips)
 
-        # Fetch from the remote so that we have the latest commits
-        if fetch:
-            for remote in repo.remotes:
-                if remote.name == remote_name:
-                    sys.stdout.write('Fetching from the remote\n')
-                    remote.fetch()
+    if ok_to_delete:
+        sys.stdout.write(
+            'These branches have been merged into {0}:\n\n'.format(
+                master_branch))
+    else:
+        sys.stdout.write('No remote branches are available for '
+                         'cleaning up\n')
+        return
 
-        master_branch = args.master
+    for ref in ok_to_delete:
+        sys.stdout.write('  {0}\n'.format(ref.remote_head))
 
-        # Find branches that could be merged
-        inspector = Inspector(repo, remote_name=remote_name,
-                              master_branch=master_branch)
-        ok_to_delete = inspector.merged_refs(skip=skips)
+    if not args.dry_run:
+        deleter = Deleter(repo, remote_name=remote_name,
+                          master_branch=master_branch)
 
-        if ok_to_delete:
-            sys.stdout.write(
-                'These branches have been merged into {0}:\n\n'.format(
-                    master_branch))
+        if not args.force:
+            sys.stdout.write('\nDelete these branches? (y/n) ')
+            answer = raw_input()
+        if args.force or answer.lower().startswith('y'):
+            sys.stdout.write('\n')
+            for ref in ok_to_delete:
+                sys.stdout.write('  deleting {0}'.format(ref.remote_head))
+                deleter.remove_remote_refs([ref])
+                sys.stdout.write(' (done)\n')
+
+            sys.stdout.write('\nAll done!\n')
+            sys.stdout.write('\nTell everyone to run `git fetch --prune` '
+                             'to sync with this remote.\n')
+            sys.stdout.write('(you don\'t have to, yours is synced)\n')
         else:
-            sys.stdout.write('No remote branches are available for '
-                             'cleaning up\n')
-            return
-
-        for ref in ok_to_delete:
-            sys.stdout.write('  {0}\n'.format(ref.remote_head))
-
-        if not args.dry_run:
-            deleter = Deleter(repo, remote_name=remote_name,
-                              master_branch=master_branch)
-
-            if not args.force:
-                sys.stdout.write('\nDelete these branches? (y/n) ')
-                answer = raw_input()
-            if args.force or answer.lower().startswith('y'):
-                sys.stdout.write('\n')
-                for ref in ok_to_delete:
-                    sys.stdout.write('  deleting {0}'.format(ref.remote_head))
-                    deleter.remove_remote_refs([ref])
-                    sys.stdout.write(' (done)\n')
-
-                sys.stdout.write('\nAll done!\n')
-                sys.stdout.write('\nTell everyone to run `git fetch --prune` '
-                                 'to sync with this remote.\n')
-                sys.stdout.write('(you don\'t have to, yours is synced)\n')
-            else:
-                sys.stdout.write('\nOK, aborting.\n')
-        elif ok_to_delete:
-            sys.stdout.write('\nTo delete them, run again without --dry-run\n')
+            sys.stdout.write('\nOK, aborting.\n')
+    elif ok_to_delete:
+        sys.stdout.write('\nTo delete them, run again without --dry-run\n')
 
 
 def parse_args(args):

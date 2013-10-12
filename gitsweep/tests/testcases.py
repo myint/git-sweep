@@ -13,9 +13,9 @@ from mock import patch
 from git import Repo
 from git.cmd import Git
 
+from gitsweep import cli
 from gitsweep.inspector import Inspector
 from gitsweep.deleter import Deleter
-from gitsweep.cli import CommandLine
 
 
 @contextmanager
@@ -209,15 +209,13 @@ class CommandTestCase(GitSweepTestCase, InspectorTestCase, DeleterTestCase):
     def cli(self):
         """Return and optionally create a CommandLine object."""
         if not self._commandline:
-            self._commandline = CommandLine([])
+            self._commandline = cli.run([''])
 
         return self._commandline
 
     def gscommand(self, command):
         """Runs the command with the given args."""
         args = split(command)
-
-        self.cli.args = args[1:]
 
         patches = (
             patch.object(sys, 'stdout'),
@@ -228,7 +226,7 @@ class CommandTestCase(GitSweepTestCase, InspectorTestCase, DeleterTestCase):
             stderr = sys.stderr
             se = None
             try:
-                self.cli.run()
+                cli.run(args)
             except SystemExit as exception:
                 se = exception
 
