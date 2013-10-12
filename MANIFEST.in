@@ -1,2 +1,6 @@
 include README.rst
 include NEWS.txt
+
+exclude .travis.yml
+exclude LICENSE.txt
+exclude tox.ini
