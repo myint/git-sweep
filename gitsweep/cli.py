@@ -41,7 +41,7 @@ class CommandLine(object):
                         dest='force', help='do not ask, cleanup immediately')
     parser.add_argument('--origin', **_origin_kwargs)
     parser.add_argument('--master', **_master_kwargs)
-    parser.add_argument('--nofetch', **_no_fetch_kwargs)
+    parser.add_argument('--no-fetch', **_no_fetch_kwargs)
     parser.add_argument('--skip', **_skip_kwargs)
     parser.add_argument('--dry-run', action='store_true',
                         help='show what would be swept')

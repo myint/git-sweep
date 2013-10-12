@@ -24,7 +24,7 @@ class TestHelpMenu(CommandTestCase):
     def test_no_fetch(self):
         """Will not fetch if told not to."""
         (retcode, stdout, stderr) = self.gscommand(
-            'git-sweep --dry-run --nofetch')
+            'git-sweep --dry-run --no-fetch')
 
         self.assertResults('''
             No remote branches are available for cleaning up
