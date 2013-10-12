@@ -8,28 +8,13 @@ class TestHelpMenu(CommandTestCase):
     """Command-line tool can show the help menu."""
 
     def test_help(self):
-        """If no arguments are given the help menu is displayed."""
         (retcode, stdout, stderr) = self.gscommand('git-sweep -h')
 
-        self.assertResults('''
-            usage: git-sweep <action> [-h]
-
-            Clean up your Git remote branches.
-
-            optional arguments:
-              -h, --help         show this help message and exit
-
-            action:
-              Preview changes or perform clean up
-
-              {preview,cleanup}
-                preview          Preview the branches that will be deleted
-                cleanup          Delete merged branches from the remote
-            ''', stdout)
+        self.assertTrue(stdout)
 
     def test_fetch(self):
         """Will fetch if told not to."""
-        (retcode, stdout, stderr) = self.gscommand('git-sweep preview')
+        (retcode, stdout, stderr) = self.gscommand('git-sweep --dry-run')
 
         self.assertResults('''
             Fetching from the remote
@@ -39,7 +24,7 @@ class TestHelpMenu(CommandTestCase):
     def test_no_fetch(self):
         """Will not fetch if told not to."""
         (retcode, stdout, stderr) = self.gscommand(
-            'git-sweep preview --nofetch')
+            'git-sweep --dry-run --nofetch')
 
         self.assertResults('''
             No remote branches are available for cleaning up
@@ -54,7 +39,7 @@ class TestHelpMenu(CommandTestCase):
             self.make_commit()
             self.command('git merge branch{0}'.format(i))
 
-        (retcode, stdout, stderr) = self.gscommand('git-sweep preview')
+        (retcode, stdout, stderr) = self.gscommand('git-sweep --dry-run')
 
         self.assertResults('''
             Fetching from the remote
@@ -66,7 +51,7 @@ class TestHelpMenu(CommandTestCase):
               branch4
               branch5
 
-            To delete them, run again with `git-sweep cleanup`
+            To delete them, run again without --dry-run
             ''', stdout)
 
     def test_will_preserve_arguments(self):
@@ -79,8 +64,8 @@ class TestHelpMenu(CommandTestCase):
             self.make_commit()
             self.command('git merge branch{0}'.format(i))
 
-        preview = 'git-sweep preview --master=master --origin=origin'
-        cleanup = 'git-sweep cleanup --master=master --origin=origin'
+        preview = 'git-sweep --dry-run --master=master --origin=origin'
+        cleanup = 'git-sweep --master=master --origin=origin'
 
         (retcode, stdout, stderr) = self.gscommand(preview)
 
@@ -94,7 +79,7 @@ class TestHelpMenu(CommandTestCase):
               branch4
               branch5
 
-            To delete them, run again with `{0}`
+            To delete them, run again without --dry-run
             '''.format(cleanup), stdout)
 
     def test_will_preview_none_found(self):
@@ -104,7 +89,7 @@ class TestHelpMenu(CommandTestCase):
             self.make_commit()
             self.command('git checkout master')
 
-        (retcode, stdout, stderr) = self.gscommand('git-sweep preview')
+        (retcode, stdout, stderr) = self.gscommand('git-sweep --dry-run')
 
         self.assertResults('''
             Fetching from the remote
@@ -122,7 +107,7 @@ class TestHelpMenu(CommandTestCase):
 
         with patch('gitsweep.cli.raw_input', create=True) as ri:
             ri.return_value = 'y'
-            (retcode, stdout, stderr) = self.gscommand('git-sweep cleanup')
+            (retcode, stdout, stderr) = self.gscommand('git-sweep')
 
         self.assertResults('''
             Fetching from the remote
@@ -158,7 +143,7 @@ class TestHelpMenu(CommandTestCase):
 
         with patch('gitsweep.cli.raw_input', create=True) as ri:
             ri.return_value = 'n'
-            (retcode, stdout, stderr) = self.gscommand('git-sweep cleanup')
+            (retcode, stdout, stderr) = self.gscommand('git-sweep')
 
         self.assertResults('''
             Fetching from the remote
@@ -184,9 +169,9 @@ class TestHelpMenu(CommandTestCase):
             self.command('git merge branch{0}'.format(i))
 
         (retcode, stdout, stderr) = self.gscommand(
-            'git-sweep preview --skip=branch1,branch2')
+            'git-sweep --dry-run --skip=branch1,branch2')
 
-        cleanup = 'git-sweep cleanup --skip=branch1,branch2'
+        cleanup = 'git-sweep --skip=branch1,branch2'
 
         self.assertResults('''
             Fetching from the remote
@@ -196,7 +181,7 @@ class TestHelpMenu(CommandTestCase):
               branch4
               branch5
 
-            To delete them, run again with `{0}`
+            To delete them, run again without --dry-run
             '''.format(cleanup), stdout)
 
     def test_will_force_clean(self):
@@ -208,7 +193,7 @@ class TestHelpMenu(CommandTestCase):
             self.make_commit()
             self.command('git merge branch{0}'.format(i))
 
-        (retcode, stdout, stderr) = self.gscommand('git-sweep cleanup --force')
+        (retcode, stdout, stderr) = self.gscommand('git-sweep --force')
 
         self.assertResults('''
             Fetching from the remote

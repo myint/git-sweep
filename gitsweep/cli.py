@@ -1,7 +1,6 @@
 import sys
 from os import getcwd
 from argparse import ArgumentParser
-from textwrap import dedent
 
 from git import Repo, InvalidGitRepositoryError
 
@@ -16,10 +15,6 @@ class CommandLine(object):
         description='Clean up your Git remote branches.',
         usage='git-sweep <action> [-h]',
     )
-
-    _sub_parsers = parser.add_subparsers(
-        title='action',
-        description='Preview changes or perform clean up')
 
     _origin_kwargs = {
         'help': 'The name of the remote you wish to clean up',
@@ -42,37 +37,14 @@ class CommandLine(object):
         'action': 'store_false',
         'default': True}
 
-    _preview_usage = dedent('''
-        git-sweep preview [-h] [--nofetch] [--skip SKIPS]
-                              [--master MASTER] [--origin ORIGIN]
-        '''.strip())
-
-    _preview = _sub_parsers.add_parser(
-        'preview',
-        help='Preview the branches that will be deleted',
-        usage=_preview_usage)
-    _preview.add_argument('--origin', **_origin_kwargs)
-    _preview.add_argument('--master', **_master_kwargs)
-    _preview.add_argument('--nofetch', **_no_fetch_kwargs)
-    _preview.add_argument('--skip', **_skip_kwargs)
-    _preview.set_defaults(action='preview')
-
-    _cleanup_usage = dedent('''
-        git-sweep cleanup [-h] [--nofetch] [--skip SKIPS] [--force]
-                              [--master MASTER] [--origin ORIGIN]
-        '''.strip())
-
-    _cleanup = _sub_parsers.add_parser(
-        'cleanup',
-        help='Delete merged branches from the remote',
-        usage=_cleanup_usage)
-    _cleanup.add_argument('--force', action='store_true', default=False,
-                          dest='force', help='Do not ask, cleanup immediately')
-    _cleanup.add_argument('--origin', **_origin_kwargs)
-    _cleanup.add_argument('--master', **_master_kwargs)
-    _cleanup.add_argument('--nofetch', **_no_fetch_kwargs)
-    _cleanup.add_argument('--skip', **_skip_kwargs)
-    _cleanup.set_defaults(action='cleanup')
+    parser.add_argument('--force', action='store_true', default=False,
+                        dest='force', help='Do not ask, cleanup immediately')
+    parser.add_argument('--origin', **_origin_kwargs)
+    parser.add_argument('--master', **_master_kwargs)
+    parser.add_argument('--nofetch', **_no_fetch_kwargs)
+    parser.add_argument('--skip', **_skip_kwargs)
+    parser.add_argument('--dry-run', action='store_true',
+                        help='show what would be swept')
 
     def __init__(self, args):
         self.args = args[1:]
@@ -80,17 +52,10 @@ class CommandLine(object):
     def run(self):
         """Runs git-sweep."""
         try:
-            if not self.args:
-                self.parser.print_help()
-                sys.exit(1)
-
             self._sweep()
-
             sys.exit(0)
         except InvalidGitRepositoryError:
             sys.stderr.write('This is not a Git repository\n')
-        except Exception as e:
-            sys.stderr.write(str(e) + '\n')
 
         sys.exit(1)
 
@@ -98,7 +63,6 @@ class CommandLine(object):
         """Runs git-sweep."""
         args = self.parser.parse_args(self.args)
 
-        dry_run = True if args.action == 'preview' else False
         fetch = args.fetch
         skips = [i.strip() for i in args.skips.split(',')]
 
@@ -133,7 +97,7 @@ class CommandLine(object):
         for ref in ok_to_delete:
             sys.stdout.write('  {0}\n'.format(ref.remote_head))
 
-        if not dry_run:
+        if not args.dry_run:
             deleter = Deleter(repo, remote_name=remote_name,
                               master_branch=master_branch)
 
@@ -154,10 +118,4 @@ class CommandLine(object):
             else:
                 sys.stdout.write('\nOK, aborting.\n')
         elif ok_to_delete:
-            # Replace the first argument with cleanup
-            sysv_copy = self.args[:]
-            sysv_copy[0] = 'cleanup'
-            command = 'git-sweep {0}'.format(' '.join(sysv_copy))
-
-            sys.stdout.write(
-                '\nTo delete them, run again with `{0}`\n'.format(command))
+            sys.stdout.write('\nTo delete them, run again without --dry-run\n')
