@@ -8,10 +8,6 @@ git-sweep
 A command-line tool that helps you clean up Git branches that have been merged
 into master.
 
-One of the best features of Git is cheap branches. There are existing branching
-models like `GitHub Flow`_ and Vincent Driessen's `git-flow`_ that describe
-methods for using this feature.
-
 The problem
 -----------
 
