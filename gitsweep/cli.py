@@ -18,6 +18,7 @@ def run(argv):
 
     sys.exit(1)
 
+
 def _sweep(argv):
     """Runs git-sweep."""
     args = parse_args(argv[1:])
