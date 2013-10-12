@@ -224,13 +224,12 @@ class CommandTestCase(GitSweepTestCase, InspectorTestCase, DeleterTestCase):
         with nested(*patches):
             stdout = sys.stdout
             stderr = sys.stderr
-            se = None
             try:
-                cli.run(args)
+                code = cli.run(args)
             except SystemExit as exception:
-                se = exception
+                code = exception.code
 
         stdout = ''.join([i[0][0] for i in stdout.write.call_args_list])
         stderr = ''.join([i[0][0] for i in stderr.write.call_args_list])
 
-        return (se.code, stdout, stderr)
+        return (code, stdout, stderr)

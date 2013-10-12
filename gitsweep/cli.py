@@ -12,11 +12,11 @@ def run(argv):
     """Runs git-sweep."""
     try:
         _sweep(argv)
-        sys.exit(0)
+        return 0
     except InvalidGitRepositoryError:
         sys.stderr.write('This is not a Git repository\n')
 
-    sys.exit(1)
+    return 1
 
 
 def _sweep(argv):
