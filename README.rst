@@ -46,11 +46,11 @@ You need to have your Git repository as your current working directory.
 
     $ cd myrepo
 
-The ``preview`` command doesn't make any changes to your repo.
+The ``--dry-run`` option doesn't make any changes to your repo.
 
 ::
 
-    $ git sweep preview
+    $ git sweep --dry-run
     Fetching from the remote
     These branches have been merged into master:
 
@@ -60,14 +60,14 @@ The ``preview`` command doesn't make any changes to your repo.
       branch4
       branch5
 
-    To delete them, run again with `git sweep cleanup`
+    To delete them, run again without --dry-run
 
 If you are happy with the list, you can run the command that deletes these
-branches from the remote, ``cleanup``:
+branches from the remote:
 
 ::
 
-    $ git sweep cleanup
+    $ git sweep
     Fetching from the remote
     These branches have been merged into master:
 
@@ -95,25 +95,25 @@ You can also give it a different name for your remote and master branches.
 
 ::
 
-    $ git sweep preview --master=develop --origin=github
+    $ git sweep --dry-run --master=develop --origin=github
     ...
 
 Tell it to skip the ``git fetch`` that it does by default.
 
 ::
 
-    $ git sweep preview --nofetch
+    $ git sweep --dry-run --nofetch
     These branches have been merged into master:
 
       branch1
 
-    To delete them, run again with `git sweep cleanup --nofetch`
+    To delete them, run again without --dry-run
 
 Make it skip certain branches.
 
 ::
 
-    $ git sweep preview --skip=develop
+    $ git sweep --dry-run --skip=develop
     Fetching from the remote
     These branches have been merged into master:
 
@@ -121,7 +121,7 @@ Make it skip certain branches.
       upgrade-libs
       derp-removal
 
-    To delete them, run again with `git sweep cleanup --skip=develop`
+    To delete them, run again without --dry-run
 
 Once git-sweep finds the branches, you'll be asked to confirm that you wish to
 delete them.
@@ -135,7 +135,7 @@ immediately.
 
 ::
 
-    $ git sweep cleanup --skip=develop --force
+    $ git sweep --skip=develop --force
     Fetching from the remote
     These branches have been merged into master:
 
