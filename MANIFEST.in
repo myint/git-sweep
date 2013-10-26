@@ -3,4 +3,5 @@ include NEWS.txt
 
 exclude .travis.yml
 exclude LICENSE.txt
+exclude test.cram
 exclude tox.ini

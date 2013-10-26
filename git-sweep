@@ -78,9 +78,9 @@ def remote_heads(remote, path):
         yield text[len(start):]
 
 
-class BaseOperation(object):
+class Inspector(object):
 
-    """Base class for all Git-related operations."""
+    """Used to introspect a Git repository."""
 
     def __init__(self, repo, remote_name='origin', master_branch='master'):
         self.repo = repo
@@ -125,11 +125,6 @@ class BaseOperation(object):
                 self.remote_name))
 
         return origin
-
-
-class Inspector(BaseOperation):
-
-    """Used to introspect a Git repository."""
 
     def merged_refs(self, skip=None):
         """Returns a list of remote refs that have been merged into the master
