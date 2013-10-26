@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Clean up branches from your Git remotes."""
+
 import os
 import subprocess
 import sys
