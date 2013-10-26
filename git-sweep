@@ -6,6 +6,12 @@ import sys
 import argparse
 
 
+try:
+    raw_input
+except NameError:
+    raw_input = input
+
+
 class MissingRemote(Exception):
 
     """Raise when a remote by name is not found."""
@@ -157,7 +163,7 @@ class Deleter(BaseOperation):
 
     """Removes remote branches from the remote."""
 
-    def remove_remote_refs(self, refs):
+    def remove_remote_refs(self, refs, path):
         """Removes the remote refs from the remote.
 
         ``refs`` should be a lit of ``git.RemoteRefs`` objects.
@@ -165,11 +171,9 @@ class Deleter(BaseOperation):
         """
         origin = self._origin
 
-        pushes = []
         for ref in refs:
-            pushes.append(origin.push(':{0}'.format(ref)))
-
-        return pushes
+            git(['push', origin, ':{0}'.format(ref)],
+                path=path)
 
 
 def _sweep(argv):
@@ -221,7 +225,7 @@ def _sweep(argv):
             sys.stdout.write('\n')
             for ref in ok_to_delete:
                 sys.stdout.write('  deleting {0}'.format(ref))
-                deleter.remove_remote_refs([ref])
+                deleter.remove_remote_refs([ref], path=repo.path)
                 sys.stdout.write(' (done)\n')
 
             sys.stdout.write('\nAll done!\n')
