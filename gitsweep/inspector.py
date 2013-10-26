@@ -1,4 +1,4 @@
-from git import Git
+import subprocess
 
 from .base import BaseOperation
 
@@ -27,13 +27,15 @@ class Inspector(BaseOperation):
                 origin=origin.name, master=master.remote_head)
             head = '{origin}/{branch}'.format(
                 origin=origin.name, branch=ref.remote_head)
-            cmd = Git(self.repo.working_dir)
             # Drop to the git binary to do this, it's just easier to work with
             # at this level.
-            (retcode, stdout, stderr) = cmd.execute(
+            process = subprocess.Popen(
                 ['git', 'cherry', upstream, head],
-                with_extended_output=True, with_exceptions=False)
-            if retcode == 0 and not stdout:
+                stdin=subprocess.PIPE,
+                cwd=self.repo.working_dir,
+                stdout=subprocess.PIPE)
+            stdout = process.communicate()[0].decode('utf-8')
+            if process.returncode == 0 and not stdout:
                 # This means there are no commits in the branch that are not
                 # also in the master branch. This is ready to be deleted.
                 merged.append(ref)

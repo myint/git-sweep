@@ -1,3 +1,4 @@
+import subprocess
 import sys
 from os import chdir, getcwd
 from os.path import join, basename
@@ -11,7 +12,6 @@ from textwrap import dedent
 
 from mock import patch
 from git import Repo
-from git.cmd import Git
 
 from gitsweep import cli
 from gitsweep.inspector import Inspector
@@ -74,11 +74,9 @@ class GitSweepTestCase(TestCase):
 
     def command(self, command):
         """Runs the Git command in self.repo."""
-        args = split(command)
-
-        cmd = Git(self.repodir)
-
-        cmd.execute(args)
+        subprocess.call(split(command) + ['--quiet'],
+                        stdin=subprocess.PIPE,
+                        cwd=self.repodir)
 
     @property
     def remote(self):
