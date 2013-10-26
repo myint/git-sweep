@@ -1,0 +1,276 @@
+#!/usr/bin/env python
+
+import os
+import subprocess
+import sys
+import argparse
+
+
+class MissingRemote(Exception):
+
+    """Raise when a remote by name is not found."""
+
+
+class MissingMasterBranch(Exception):
+
+    """Raise when the "master" branch cannot be located."""
+
+
+class InvalidGitRepositoryError(Exception):
+
+    """Raise when not in a git repository."""
+
+
+class Repo(object):
+
+    """Contain git repository operations."""
+
+    def __init__(self, path):
+        self.path = path
+
+    def remotes(self):
+        """Return list of remotes."""
+        return [line.strip() for line in git(['remote'],
+                                             path=self.path).splitlines()]
+
+
+def git(arguments, path):
+    """Run git."""
+    process = subprocess.Popen(
+        ['git'] + arguments,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        cwd=path)
+
+    result = process.communicate()
+
+    if process.returncode != 0:
+        raise InvalidGitRepositoryError()
+
+    return result[0].decode('utf-8')
+
+
+def fetch(remote, path):
+    """Download objects and refs from remote repository."""
+    git(['fetch', remote], path=path)
+
+
+def remote_heads(remote, path):
+    """Yield heads."""
+    for line in git(['ls-remote', '--heads', remote], path=path).splitlines():
+        text = line.split()[1]
+        start = 'refs/heads/'
+        assert text.startswith(start)
+        yield text[len(start):]
+
+
+class BaseOperation(object):
+
+    """Base class for all Git-related operations."""
+
+    def __init__(self, repo, remote_name='origin', master_branch='master'):
+        self.repo = repo
+        self.remote_name = remote_name
+        self.master_branch = master_branch
+
+    def _filtered_remotes(self, origin, skip=[]):
+        """Returns a list of remote refs, skipping ones you don't need.
+
+        If ``skip`` is empty, it will default to ``['HEAD',
+        self.master_branch]``.
+
+        """
+        if not skip:
+            skip = ['HEAD', self.master_branch]
+
+        refs = [head for head in remote_heads(origin, self.repo.path)
+                if not head in skip]
+
+        return refs
+
+    def _master_ref(self, origin):
+        """Finds the master ref object that matches master branch."""
+        for head in remote_heads(origin, self.repo.path):
+            if head == self.master_branch:
+                return head
+
+        raise MissingMasterBranch(
+            'Could not find ref for {0}'.format(self.master_branch))
+
+    @property
+    def _origin(self):
+        """Gets the remote that references origin by name self.origin_name."""
+        origin = None
+
+        for remote in self.repo.remotes():
+            if remote == self.remote_name:
+                origin = remote
+
+        if not origin:
+            raise MissingRemote('Could not find the remote named {0}'.format(
+                self.remote_name))
+
+        return origin
+
+
+class Inspector(BaseOperation):
+
+    """Used to introspect a Git repository."""
+
+    def merged_refs(self, skip=[]):
+        """Returns a list of remote refs that have been merged into the master
+        branch.
+
+        The "master" branch may have a different name than master. The value of
+        ``self.master_name`` is used to determine what this name is.
+
+        """
+        origin = self._origin
+
+        master = self._master_ref(origin)
+        refs = self._filtered_remotes(
+            origin, skip=['HEAD', self.master_branch] + skip)
+        merged = []
+
+        for ref in refs:
+            upstream = '{origin}/{master}'.format(
+                origin=origin, master=master)
+            head = '{origin}/{branch}'.format(
+                origin=origin, branch=ref)
+            # Drop to the git binary to do this, it's just easier to work with
+            # at this level.
+            process = subprocess.Popen(
+                ['git', 'cherry', upstream, head],
+                stdin=subprocess.PIPE,
+                cwd=self.repo.path,
+                stdout=subprocess.PIPE)
+            stdout = process.communicate()[0].decode('utf-8')
+            if process.returncode == 0 and not stdout:
+                # This means there are no commits in the branch that are not
+                # also in the master branch. This is ready to be deleted.
+                merged.append(ref)
+
+        return merged
+
+
+class Deleter(BaseOperation):
+
+    """Removes remote branches from the remote."""
+
+    def remove_remote_refs(self, refs):
+        """Removes the remote refs from the remote.
+
+        ``refs`` should be a lit of ``git.RemoteRefs`` objects.
+
+        """
+        origin = self._origin
+
+        pushes = []
+        for ref in refs:
+            pushes.append(origin.push(':{0}'.format(ref)))
+
+        return pushes
+
+
+def _sweep(argv):
+    """Runs git-sweep."""
+    args = parse_args(argv[1:])
+
+    args.fetch
+    skips = [i.strip() for i in args.skips.split(',')]
+
+    # Is this a Git repository?
+    repo = Repo(os.getcwd())
+
+    remote_name = args.origin
+
+    # Fetch from the remote so that we have the latest commits
+    if args.fetch:
+        for remote in repo.remotes():
+            if remote == remote_name:
+                sys.stdout.write('Fetching from the remote\n')
+                fetch(remote, repo.path)
+
+    master_branch = args.master
+
+    # Find branches that could be merged
+    inspector = Inspector(repo, remote_name=remote_name,
+                          master_branch=master_branch)
+    ok_to_delete = inspector.merged_refs(skip=skips)
+
+    if ok_to_delete:
+        sys.stdout.write(
+            'These branches have been merged into {0}:\n\n'.format(
+                master_branch))
+    else:
+        sys.stdout.write('No remote branches are available for '
+                         'cleaning up\n')
+        return
+
+    for ref in ok_to_delete:
+        sys.stdout.write('  {0}\n'.format(ref))
+
+    if not args.dry_run:
+        deleter = Deleter(repo, remote_name=remote_name,
+                          master_branch=master_branch)
+
+        if not args.force:
+            sys.stdout.write('\nDelete these branches? (y/n) ')
+            answer = raw_input()
+        if args.force or answer.lower().startswith('y'):
+            sys.stdout.write('\n')
+            for ref in ok_to_delete:
+                sys.stdout.write('  deleting {0}'.format(ref))
+                deleter.remove_remote_refs([ref])
+                sys.stdout.write(' (done)\n')
+
+            sys.stdout.write('\nAll done!\n')
+            sys.stdout.write("\nTell everyone to run 'git fetch --prune' "
+                             'to sync with this remote.\n')
+            sys.stdout.write('(you don\'t have to, yours is synced)\n')
+        else:
+            sys.stdout.write('\nOK, aborting.\n')
+    elif ok_to_delete:
+        sys.stdout.write('\nTo delete them, run again without --dry-run\n')
+
+
+def parse_args(args):
+    """Return parsed arguments."""
+    parser = argparse.ArgumentParser(
+        description='Clean up your Git remote branches.',
+        prog='git-sweep')
+
+    parser.add_argument('--force', action='store_true', default=False,
+                        dest='force', help='do not ask, cleanup immediately')
+    parser.add_argument('--origin',
+                        help='name of the remote you wish to clean up',
+                        default='origin')
+    parser.add_argument('--master',
+                        help='name of what you consider the master branch',
+                        default='master')
+    parser.add_argument('--no-fetch', dest='fetch',
+                        help='do not fetch from the remote',
+                        action='store_false',
+                        default=True)
+    parser.add_argument('--skip', dest='skips',
+                        help='comma-separated list of branches to skip',
+                        default='')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='show what would be swept')
+
+    return parser.parse_args(args)
+
+
+def main():
+    """Runs git-sweep."""
+    try:
+        _sweep(sys.argv)
+        return 0
+    except InvalidGitRepositoryError:
+        sys.stderr.write('This is not a Git repository\n')
+
+    return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())

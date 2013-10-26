@@ -42,14 +42,4 @@ setup(name='git-sweep',
       author_email='',
       url='http://arc90.com',
       license='MIT',
-      packages=['gitsweep',
-                'gitsweep.scripts',
-                'gitsweep.tests'],
-      include_package_data=True,
-      zip_safe=False,
-      install_requires=install_requires,
-      entry_points={
-          'console_scripts':
-          ['git-sweep=gitsweep.entrypoints:main']
-      },
-      test_suite='gitsweep.scripts.test')
+      scripts=['git-sweep'])
