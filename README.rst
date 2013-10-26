@@ -148,15 +148,6 @@ immediately.
     Tell everyone to run `git fetch --prune` to sync with this remote.
     (you don't have to, yours is synced)
 
-Development
------------
-
-We also use Tox_. It will run the tests for Python 2.6 and 2.7.
-
-::
-
-    $ ./bin/tox
-
 Requirements
 ------------
 
@@ -167,5 +158,3 @@ License
 -------
 
 Friendly neighborhood MIT license.
-
-.. _Tox: http://pypi.python.org/pypi/tox
