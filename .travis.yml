@@ -14,5 +14,4 @@ before_script:
     - if [ "$TRAVIS_REPO_SLUG" != "" ]; then git config --global user.email "you@example.com"; git config --global user.name "Your Name"; fi
 
 script:
-    - python -m gitsweep.scripts.test
     - git-sweep --dry-run
