@@ -10,7 +10,8 @@ Test a minimal example.
 
     $ git init --bare --quiet bare.git
 
-    $ git clone --quiet bare.git example >& /dev/null
+    $ git clone --quiet bare.git example
+    warning: You appear to have cloned an empty repository.
     $ cd example
     $ touch foo.txt
     $ git add foo.txt
