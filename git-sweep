@@ -14,17 +14,22 @@ except NameError:
     raw_input = input
 
 
-class MissingRemote(Exception):
+class GitSweepException(Exception):
+
+    """git-sweep-related exceptions."""
+
+
+class MissingRemote(GitSweepException):
 
     """Raise when a remote by name is not found."""
 
 
-class MissingMasterBranch(Exception):
+class MissingMasterBranch(GitSweepException):
 
     """Raise when the "master" branch cannot be located."""
 
 
-class InvalidGitRepositoryError(Exception):
+class InvalidGitRepositoryError(GitSweepException):
 
     """Raise when not in a git repository."""
 
@@ -48,12 +53,13 @@ def git(arguments, path):
         ['git'] + arguments,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         cwd=path)
 
     result = process.communicate()
 
     if process.returncode != 0:
-        raise InvalidGitRepositoryError()
+        raise InvalidGitRepositoryError('Not a valid git repository')
 
     return result[0].decode('utf-8')
 
@@ -274,8 +280,8 @@ def main():
     try:
         _sweep(sys.argv)
         return 0
-    except InvalidGitRepositoryError:
-        sys.stderr.write('This is not a Git repository\n')
+    except GitSweepException as exception:
+        sys.stderr.write(str(exception) + '\n')
 
     return 1
 

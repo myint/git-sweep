@@ -7,6 +7,7 @@ python:
     - "3.3"
 
 install:
+    - pip install --quiet git+https://github.com/myint/cram
     - if [ "$TRAVIS_PYTHON_VERSION" == "2.6" ]; then pip --quiet install argparse; fi
     - python setup.py --quiet install
 
@@ -15,4 +16,5 @@ before_script:
     - if [ "$TRAVIS_REPO_SLUG" != "" ]; then git config --global user.email "you@example.com"; git config --global user.name "Your Name"; fi
 
 script:
+    - cram --indent=4 test.cram
     - git-sweep --dry-run

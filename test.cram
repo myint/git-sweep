@@ -1,0 +1,44 @@
+#!/usr/bin/env cram --indent=4
+
+Test expected failures.
+
+    $ git-sweep
+    Not a valid git repository
+    [1]
+
+Test a minimal example.
+
+    $ git init --bare --quiet bare.git
+
+    $ git clone --quiet bare.git example >& /dev/null
+    $ cd example
+    $ touch foo.txt
+    $ git add foo.txt
+    $ git commit --quiet --message='Test'
+    $ git push --quiet origin master
+
+    $ git checkout --quiet -b bar
+
+    $ touch bar.txt
+    $ git add bar.txt
+    $ git commit --quiet --message='Test'
+    $ git push --quiet origin bar
+    $ git-sweep
+    Fetching from the remote
+    No remote branches are available for cleaning up
+
+    $ git checkout --quiet master
+    $ git merge --quiet bar
+    $ git push --quiet origin master
+    $ git-sweep --force
+    Fetching from the remote
+    These branches have been merged into master:
+    
+      bar
+    
+      deleting bar (done)
+    
+    All done!
+    
+    Tell everyone to run 'git fetch --prune' to sync with this remote.
+    (you don't have to, yours is synced)
