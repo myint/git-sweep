@@ -29,7 +29,7 @@ To install it run:
 
 ::
 
-    pip install git-sweep
+    pip install git+https://github.com/myint/git-sweep
 
 Try it for yourself (safely)
 ----------------------------
