@@ -79,7 +79,7 @@ class BaseOperation(object):
         self.remote_name = remote_name
         self.master_branch = master_branch
 
-    def _filtered_remotes(self, origin, skip=[]):
+    def _filtered_remotes(self, origin, skip=None):
         """Returns a list of remote refs, skipping ones you don't need.
 
         If ``skip`` is empty, it will default to ``['HEAD',
@@ -123,7 +123,7 @@ class Inspector(BaseOperation):
 
     """Used to introspect a Git repository."""
 
-    def merged_refs(self, skip=[]):
+    def merged_refs(self, skip=None):
         """Returns a list of remote refs that have been merged into the master
         branch.
 
@@ -131,6 +131,9 @@ class Inspector(BaseOperation):
         ``self.master_name`` is used to determine what this name is.
 
         """
+        if skip is None:
+            skip = []
+
         origin = self._origin
 
         master = self._master_ref(origin)
@@ -180,7 +183,6 @@ def _sweep(argv):
     """Runs git-sweep."""
     args = parse_args(argv[1:])
 
-    args.fetch
     skips = [i.strip() for i in args.skips.split(',')]
 
     # Is this a Git repository?
