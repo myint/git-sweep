@@ -24,7 +24,7 @@ class Inspector(BaseOperation):
 
         for ref in refs:
             upstream = '{origin}/{master}'.format(
-                origin=origin.name, master=master.remote_head)
+                origin=origin.name, master=master)
             head = '{origin}/{branch}'.format(
                 origin=origin.name, branch=ref.remote_head)
             # Drop to the git binary to do this, it's just easier to work with

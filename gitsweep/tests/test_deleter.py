@@ -24,7 +24,7 @@ class TestDeleter(GitSweepTestCase, InspectorTestCase, DeleterTestCase):
         expected.
 
         """
-        clone = self.remote.remotes[0]
+        clone = self.remote.remotes()[0]
 
         # Grab all the remote branches
         before = [i.remote_head for i in clone.refs]

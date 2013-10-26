@@ -92,7 +92,7 @@ class GitSweepTestCase(TestCase):
             self._remote = Repo.clone(self.repo, clonedir)
 
         # Update in case the remote has changed
-        self._remote.remotes[0].pull()
+        self._remote.remotes()[0].pull()
         return self._remote
 
     def make_commit(self):

@@ -2,10 +2,9 @@ import sys
 from os import getcwd
 from argparse import ArgumentParser
 
-from git import Repo, InvalidGitRepositoryError
-
-from gitsweep.inspector import Inspector
-from gitsweep.deleter import Deleter
+from . inspector import Inspector
+from . deleter import Deleter
+from . import base
 
 
 def run(argv):
@@ -13,7 +12,7 @@ def run(argv):
     try:
         _sweep(argv)
         return 0
-    except InvalidGitRepositoryError:
+    except base.InvalidGitRepositoryError:
         sys.stderr.write('This is not a Git repository\n')
 
     return 1
@@ -23,20 +22,20 @@ def _sweep(argv):
     """Runs git-sweep."""
     args = parse_args(argv[1:])
 
-    fetch = args.fetch
+    args.fetch
     skips = [i.strip() for i in args.skips.split(',')]
 
     # Is this a Git repository?
-    repo = Repo(getcwd())
+    repo = base.Repo(getcwd())
 
     remote_name = args.origin
 
     # Fetch from the remote so that we have the latest commits
-    if fetch:
-        for remote in repo.remotes:
-            if remote.name == remote_name:
+    if args.fetch:
+        for remote in repo.remotes():
+            if remote == remote_name:
                 sys.stdout.write('Fetching from the remote\n')
-                remote.fetch()
+                base.fetch(remote, repo.path)
 
     master_branch = args.master
 

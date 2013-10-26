@@ -16,7 +16,7 @@ class TestInspector(GitSweepTestCase, InspectorTestCase):
             self.command('git checkout master')
 
         refs = self.inspector._filtered_remotes(
-            self.inspector.repo.remotes[0])
+            self.inspector.repo.remotes()[0])
 
         self.assertEqual(['branch1', 'branch2', 'branch3'],
                          [i.remote_head for i in refs])
