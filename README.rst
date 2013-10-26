@@ -152,7 +152,7 @@ Requirements
 ------------
 
 * Git >= 1.7
-* Python >= 2.6
+* Python >= 2.6 or >= 3.2
 
 License
 -------
