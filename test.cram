@@ -31,6 +31,13 @@ Test a minimal example.
     $ git checkout --quiet master
     $ git merge --quiet bar
     $ git push --quiet origin master
+
+    $ git branch --all
+      bar
+    * master
+      remotes/origin/bar
+      remotes/origin/master
+
     $ "$TESTDIR/git-sweep" --force
     Fetching from the remote
     These branches have been merged into master:
@@ -43,3 +50,7 @@ Test a minimal example.
     
     Tell everyone to run 'git fetch --prune' to sync with this remote.
     (you don't have to, yours is synced)
+
+    $ git branch --all
+    * master
+      remotes/origin/master
