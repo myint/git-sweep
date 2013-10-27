@@ -228,16 +228,18 @@ def _sweep(path, args):
 def parse_args(arguments):
     """Return parsed arguments."""
     parser = argparse.ArgumentParser(
-        description='Clean up your Git remote branches.',
-        prog='git-sweep')
+        prog='git-sweep',
+        description='Clean up your Git remote branches.')
 
     parser.add_argument('--force', action='store_true', default=False,
                         dest='force', help='do not ask, cleanup immediately')
     parser.add_argument('--origin',
-                        help='name of the remote you wish to clean up',
+                        help='name of the remote you wish to clean up '
+                             '(default: %(default)s)',
                         default='origin')
     parser.add_argument('--master',
-                        help='name of what you consider the master branch',
+                        help='name of what you consider the master branch '
+                             '(default: %(default)s)',
                         default='master')
     parser.add_argument('--no-fetch', dest='fetch',
                         help='do not fetch from the remote',
@@ -250,7 +252,8 @@ def parse_args(arguments):
                         help='show what would be swept')
 
     parser.add_argument('path', nargs='*', default=[os.getcwd()],
-                        help='local repositories to sweep')
+                        help='local repositories to sweep '
+                             '(default: %(default)s)')
 
     args = parser.parse_args(arguments)
 
