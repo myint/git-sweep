@@ -38,6 +38,14 @@ Test a minimal example.
       remotes/origin/bar
       remotes/origin/master
 
+    $ "$TESTDIR/git-sweep" --dry-run
+    Fetching from the remote
+    These branches have been merged into master:
+    
+      bar
+    
+    To delete them, run again without --dry-run
+
     $ "$TESTDIR/git-sweep" --force
     Fetching from the remote
     These branches have been merged into master:
