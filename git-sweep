@@ -78,8 +78,8 @@ def master_ref(origin, master_branch, path):
 def merged_refs(path, remote_name, master_branch, skip):
     """Return a list of remote refs that have been merged into the master.
 
-    The "master" branch may have a different name than master. The value of
-    ``self.master_name`` is used to determine what this name is.
+    The "master" branch may have a different name than master. The value
+    of ``self.master_name`` is used to determine what this name is.
 
     """
     master = master_ref(remote_name,
@@ -96,7 +96,7 @@ def merged_refs(path, remote_name, master_branch, skip):
                                           branch=ref)
         try:
             output = git(['cherry', upstream, head],
-                path=path)
+                         path=path)
             if not output:
                 yield ref
         except GitSweepException:
