@@ -22,17 +22,10 @@ class GitSweepException(Exception):
     """git-sweep-related exceptions."""
 
 
-class Repo(object):
-
-    """Contain git repository operations."""
-
-    def __init__(self, path):
-        self.path = path
-
-    def remotes(self):
-        """Return list of remotes."""
-        return [line.strip() for line in git(['remote'],
-                                             path=self.path).splitlines()]
+def remotes(path):
+    """Return list of remotes."""
+    return [line.strip() for line in git(['remote'],
+                                         path=path).splitlines()]
 
 
 def git(arguments, path, raise_exception_on_error=True):
@@ -89,7 +82,7 @@ def master_ref(origin, master_branch, path):
         'Could not find ref for {0}'.format(master_branch))
 
 
-def merged_refs(repo, remote_name, master_branch, skip):
+def merged_refs(path, remote_name, master_branch, skip):
     """Return a list of remote refs that have been merged into the master.
 
     The "master" branch may have a different name than master. The value of
@@ -100,11 +93,11 @@ def merged_refs(repo, remote_name, master_branch, skip):
 
     master = master_ref(origin,
                         master_branch=master_branch,
-                        path=repo.path)
+                        path=path)
 
     refs = filtered_remotes(origin,
                             skip=['HEAD', master_branch] + skip,
-                            path=repo.path)
+                            path=path)
     merged = []
 
     for ref in refs:
@@ -117,7 +110,7 @@ def merged_refs(repo, remote_name, master_branch, skip):
         process = subprocess.Popen(
             ['git', 'cherry', upstream, head],
             stdin=subprocess.PIPE,
-            cwd=repo.path,
+            cwd=path,
             stdout=subprocess.PIPE)
         stdout = process.communicate()[0].decode('utf-8')
         if process.returncode == 0 and not stdout:
@@ -138,17 +131,16 @@ def sweep(argv):
 
 def _sweep(path, args):
     """Run git-sweep on a local repository."""
-    repo = Repo(path)
     remote_name = args.origin
 
     # Fetch from the remote so that we have the latest commits
     if args.fetch:
-        for remote in repo.remotes():
+        for remote in remotes(path):
             if remote == remote_name:
                 sys.stdout.write('Fetching from the remote\n')
                 fetch(remote, path)
 
-    ok_to_delete = merged_refs(repo,
+    ok_to_delete = merged_refs(path,
                                remote_name=remote_name,
                                master_branch=args.master,
                                skip=args.skips)
