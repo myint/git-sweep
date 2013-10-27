@@ -79,6 +79,16 @@ def filtered_remotes(origin, skip, path):
     return refs
 
 
+def master_ref(origin, master_branch, path):
+    """Find the master ref object that matches master branch."""
+    for head in remote_heads(origin, path):
+        if head == master_branch:
+            return head
+
+    raise GitSweepException(
+        'Could not find ref for {0}'.format(master_branch))
+
+
 class Inspector(object):
 
     """Used to introspect a Git repository."""
@@ -87,15 +97,6 @@ class Inspector(object):
         self.repo = repo
         self.remote_name = remote_name
         self.master_branch = master_branch
-
-    def _master_ref(self, origin):
-        """Find the master ref object that matches master branch."""
-        for head in remote_heads(origin, self.repo.path):
-            if head == self.master_branch:
-                return head
-
-        raise GitSweepException(
-            'Could not find ref for {0}'.format(self.master_branch))
 
     @property
     def _origin(self):
@@ -121,7 +122,10 @@ class Inspector(object):
         """
         origin = self._origin
 
-        master = self._master_ref(origin)
+        master = master_ref(origin,
+                            master_branch=self.master_branch,
+                            path=self.repo.path)
+
         refs = filtered_remotes(origin,
                                 skip=['HEAD', self.master_branch] + skip,
                                 path=self.repo.path)
