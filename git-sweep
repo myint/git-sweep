@@ -22,21 +22,6 @@ class GitSweepException(Exception):
     """git-sweep-related exceptions."""
 
 
-class MissingRemote(GitSweepException):
-
-    """Raise when a remote by name is not found."""
-
-
-class MissingMasterBranch(GitSweepException):
-
-    """Raise when the "master" branch cannot be located."""
-
-
-class InvalidGitRepositoryError(GitSweepException):
-
-    """Raise when not in a git repository."""
-
-
 class Repo(object):
 
     """Contain git repository operations."""
@@ -62,7 +47,7 @@ def git(arguments, path, raise_exception_on_error=True):
     result = process.communicate()
 
     if raise_exception_on_error and process.returncode != 0:
-        raise InvalidGitRepositoryError(result[1].decode('utf-8').strip())
+        raise GitSweepException(result[1].decode('utf-8').strip())
 
     return result[0].decode('utf-8')
 
@@ -90,16 +75,13 @@ class Inspector(object):
         self.remote_name = remote_name
         self.master_branch = master_branch
 
-    def _filtered_remotes(self, origin, skip=None):
+    def _filtered_remotes(self, origin, skip):
         """Return a list of remote refs, skipping ones you don't need.
 
         If ``skip`` is empty, it will default to ``['HEAD',
         self.master_branch]``.
 
         """
-        if not skip:
-            skip = ['HEAD', self.master_branch]
-
         refs = [head for head in remote_heads(origin, self.repo.path)
                 if not head in skip]
 
@@ -111,7 +93,7 @@ class Inspector(object):
             if head == self.master_branch:
                 return head
 
-        raise MissingMasterBranch(
+        raise GitSweepException(
             'Could not find ref for {0}'.format(self.master_branch))
 
     @property
@@ -124,26 +106,23 @@ class Inspector(object):
                 origin = remote
 
         if not origin:
-            raise MissingRemote('Could not find the remote named {0}'.format(
-                self.remote_name))
+            raise GitSweepException(
+                'Could not find the remote named {0}'.format(self.remote_name))
 
         return origin
 
-    def merged_refs(self, skip=None):
+    def merged_refs(self, skip):
         """Return a list of remote refs that have been merged into the master.
 
         The "master" branch may have a different name than master. The value of
         ``self.master_name`` is used to determine what this name is.
 
         """
-        if skip is None:
-            skip = []
-
         origin = self._origin
 
         master = self._master_ref(origin)
-        refs = self._filtered_remotes(
-            origin, skip=['HEAD', self.master_branch] + skip)
+        refs = self._filtered_remotes(origin,
+                                      skip=['HEAD', self.master_branch] + skip)
         merged = []
 
         for ref in refs:
@@ -192,7 +171,7 @@ def _sweep(path, args):
     # Find branches that could be merged
     inspector = Inspector(repo, remote_name=remote_name,
                           master_branch=master_branch)
-    ok_to_delete = inspector.merged_refs(skip=args.skips)
+    ok_to_delete = inspector.merged_refs(args.skips)
 
     if ok_to_delete:
         sys.stdout.write(
