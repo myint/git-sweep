@@ -45,11 +45,6 @@ def git(arguments, path, raise_exception_on_error=True):
     return result[0].decode('utf-8')
 
 
-def fetch(remote, path):
-    """Download objects and refs from remote repository."""
-    git(['fetch', '--prune', remote], path=path)
-
-
 def remote_heads(remote, path):
     """Yield heads."""
     for line in git(['ls-remote', '--heads', remote], path=path).splitlines():
@@ -66,10 +61,8 @@ def filtered_remotes(origin, skip, path):
     self.master_branch]``.
 
     """
-    refs = [head for head in remote_heads(origin, path)
+    return [head for head in remote_heads(origin, path)
             if not head in skip]
-
-    return refs
 
 
 def master_ref(origin, master_branch, path):
@@ -89,22 +82,18 @@ def merged_refs(path, remote_name, master_branch, skip):
     ``self.master_name`` is used to determine what this name is.
 
     """
-    origin = remote_name
-
-    master = master_ref(origin,
+    master = master_ref(remote_name,
                         master_branch=master_branch,
                         path=path)
 
-    refs = filtered_remotes(origin,
+    refs = filtered_remotes(remote_name,
                             skip=['HEAD', master_branch] + skip,
                             path=path)
-    merged = []
-
     for ref in refs:
-        upstream = '{origin}/{master}'.format(
-            origin=origin, master=master)
-        head = '{origin}/{branch}'.format(
-            origin=origin, branch=ref)
+        upstream = '{origin}/{master}'.format(origin=remote_name,
+                                              master=master)
+        head = '{origin}/{branch}'.format(origin=remote_name,
+                                          branch=ref)
         # Drop to the git binary to do this, it's just easier to work with
         # at this level.
         process = subprocess.Popen(
@@ -116,9 +105,7 @@ def merged_refs(path, remote_name, master_branch, skip):
         if process.returncode == 0 and not stdout:
             # This means there are no commits in the branch that are not
             # also in the master branch. This is ready to be deleted.
-            merged.append(ref)
-
-    return merged
+            yield ref
 
 
 def sweep(argv):
@@ -138,12 +125,12 @@ def _sweep(path, args):
         for remote in remotes(path):
             if remote == remote_name:
                 sys.stdout.write('Fetching from the remote\n')
-                fetch(remote, path)
+                git(['fetch', '--prune', remote], path=path)
 
-    ok_to_delete = merged_refs(path,
-                               remote_name=remote_name,
-                               master_branch=args.master,
-                               skip=args.skips)
+    ok_to_delete = list(merged_refs(path,
+                                    remote_name=remote_name,
+                                    master_branch=args.master,
+                                    skip=args.skips))
 
     if ok_to_delete:
         sys.stdout.write(
