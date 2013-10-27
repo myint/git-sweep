@@ -98,7 +98,7 @@ Tell it to skip the ``git fetch`` that it does by default.
 
 ::
 
-    $ git sweep --dry-run --nofetch
+    $ git sweep --dry-run --no-fetch
     These branches have been merged into master:
 
       branch1
