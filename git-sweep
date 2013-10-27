@@ -164,15 +164,16 @@ class Inspector(object):
         return merged
 
 
-def _sweep(argv):
+def sweep(argv):
     """Run git-sweep."""
     args = parse_args(argv[1:])
 
-    skips = [i.strip() for i in args.skips.split(',')]
+    for path in args.path:
+        _sweep(path, args)
 
-    # Is this a Git repository?
-    repo = Repo(os.getcwd())
 
+def _sweep(path, args):
+    repo = Repo(path)
     remote_name = args.origin
 
     # Fetch from the remote so that we have the latest commits
@@ -180,14 +181,14 @@ def _sweep(argv):
         for remote in repo.remotes():
             if remote == remote_name:
                 sys.stdout.write('Fetching from the remote\n')
-                fetch(remote, repo.path)
+                fetch(remote, path)
 
     master_branch = args.master
 
     # Find branches that could be merged
     inspector = Inspector(repo, remote_name=remote_name,
                           master_branch=master_branch)
-    ok_to_delete = inspector.merged_refs(skip=skips)
+    ok_to_delete = inspector.merged_refs(skip=args.skips)
 
     if ok_to_delete:
         sys.stdout.write(
@@ -209,9 +210,9 @@ def _sweep(argv):
             sys.stdout.write('\n')
             for ref in ok_to_delete:
                 sys.stdout.write('  deleting {0}'.format(ref))
-                git(['push', remote_name, ':{0}'.format(ref)], path=repo.path)
+                git(['push', remote_name, ':{0}'.format(ref)], path=path)
                 git(['branch', '--delete', ref],
-                    path=repo.path, raise_exception_on_error=False)
+                    path=path, raise_exception_on_error=False)
                 sys.stdout.write(' (done)\n')
 
             sys.stdout.write('\nAll done!\n')
@@ -224,7 +225,7 @@ def _sweep(argv):
         sys.stdout.write('\nTo delete them, run again without --dry-run\n')
 
 
-def parse_args(args):
+def parse_args(arguments):
     """Return parsed arguments."""
     parser = argparse.ArgumentParser(
         description='Clean up your Git remote branches.',
@@ -248,13 +249,20 @@ def parse_args(args):
     parser.add_argument('--dry-run', action='store_true',
                         help='show what would be swept')
 
-    return parser.parse_args(args)
+    parser.add_argument('path', nargs='*', default=[os.getcwd()],
+                        help='local repositories to sweep')
+
+    args = parser.parse_args(arguments)
+
+    args.skips = [i.strip() for i in args.skips.split(',')]
+
+    return args
 
 
 def main():
     """Run git-sweep."""
     try:
-        _sweep(sys.argv)
+        sweep(sys.argv)
         return 0
     except GitSweepException as exception:
         sys.stderr.write(str(exception) + '\n')
