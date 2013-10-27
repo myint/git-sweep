@@ -1,27 +1,31 @@
 #!/usr/bin/env python
 
-import sys
+"""Set up git-sweep."""
+
+import ast
 import os
 from setuptools import setup
 
-here = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(here, 'README.rst')) as _readme:
+ROOT = os.path.abspath(os.path.dirname(__file__))
+
+
+def version():
+    """Return version string."""
+    with open('git-sweep') as input_file:
+        for line in input_file:
+            if line.startswith('__version__'):
+                return ast.parse(line).body[0].value.s
+
+
+with open(os.path.join(ROOT, 'README.rst')) as _readme:
     README = _readme.read()
 
-with open(os.path.join(here, 'NEWS.txt')) as _news:
+with open(os.path.join(ROOT, 'NEWS.txt')) as _news:
     NEWS = _news.read()
 
-version = '0.2'
-
-install_requires = [
-    'GitPython>=0.3.2RC1']
-
-if sys.version_info < (2, 7):
-    install_requires.append('argparse>=1.2.1')
-
 setup(name='git-sweep',
-      version=version,
+      version=version(),
       description='Clean up branches from your Git remotes',
       long_description=README + '\n\n' + NEWS,
       classifiers=[

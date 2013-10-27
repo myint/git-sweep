@@ -14,6 +14,9 @@ except NameError:
     raw_input = input
 
 
+__version__ = '0.3a0'
+
+
 class GitSweepException(Exception):
 
     """git-sweep-related exceptions."""
@@ -173,6 +176,7 @@ def sweep(argv):
 
 
 def _sweep(path, args):
+    """Run git-sweep on a local repository."""
     repo = Repo(path)
     remote_name = args.origin
 

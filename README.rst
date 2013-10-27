@@ -34,13 +34,8 @@ To install it run:
 Try it for yourself (safely)
 ----------------------------
 
-To see a list of branches that git-sweep detects are merged into your master branch:
-
-You need to have your Git repository as your current working directory.
-
-::
-
-    $ cd myrepo
+To see a list of branches that git-sweep detects are merged into your master
+branch:
 
 The ``--dry-run`` option doesn't make any changes to your repo.
 
@@ -115,7 +110,6 @@ Make it skip certain branches.
 
       important-upgrade
       upgrade-libs
-      derp-removal
 
     To delete them, run again without --dry-run
 
@@ -137,11 +131,9 @@ immediately.
 
       important-upgrade
       upgrade-libs
-      derp-removal
 
       deleting important-upgrade (done)
       deleting upgrade-libs (done)
-      deleting derp-removal (done)
 
     All done!
 
