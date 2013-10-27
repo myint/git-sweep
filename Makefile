@@ -5,7 +5,6 @@ check:
 		--report=no \
 		--disable=invalid-name \
 		--disable=no-member \
-		--disable=too-few-public-methods \
 		git-sweep setup.py
 	check-manifest
 	python setup.py --long-description | rst2html.py --strict > /dev/null

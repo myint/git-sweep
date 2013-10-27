@@ -98,21 +98,6 @@ class Inspector(object):
         self.remote_name = remote_name
         self.master_branch = master_branch
 
-    @property
-    def _origin(self):
-        """Get the remote that references origin by name self.origin_name."""
-        origin = None
-
-        for remote in self.repo.remotes():
-            if remote == self.remote_name:
-                origin = remote
-
-        if not origin:
-            raise GitSweepException(
-                'Could not find the remote named {0}'.format(self.remote_name))
-
-        return origin
-
     def merged_refs(self, skip):
         """Return a list of remote refs that have been merged into the master.
 
@@ -120,7 +105,7 @@ class Inspector(object):
         ``self.master_name`` is used to determine what this name is.
 
         """
-        origin = self._origin
+        origin = self.remote_name
 
         master = master_ref(origin,
                             master_branch=self.master_branch,
