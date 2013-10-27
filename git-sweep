@@ -94,18 +94,13 @@ def merged_refs(path, remote_name, master_branch, skip):
                                               master=master)
         head = '{origin}/{branch}'.format(origin=remote_name,
                                           branch=ref)
-        # Drop to the git binary to do this, it's just easier to work with
-        # at this level.
-        process = subprocess.Popen(
-            ['git', 'cherry', upstream, head],
-            stdin=subprocess.PIPE,
-            cwd=path,
-            stdout=subprocess.PIPE)
-        stdout = process.communicate()[0].decode('utf-8')
-        if process.returncode == 0 and not stdout:
-            # This means there are no commits in the branch that are not
-            # also in the master branch. This is ready to be deleted.
-            yield ref
+        try:
+            output = git(['cherry', upstream, head],
+                path=path)
+            if not output:
+                yield ref
+        except GitSweepException:
+            pass
 
 
 def sweep(argv):
