@@ -47,7 +47,7 @@ class Repo(object):
                                              path=self.path).splitlines()]
 
 
-def git(arguments, path):
+def git(arguments, path, raise_exception_on_error=True):
     """Run git."""
     process = subprocess.Popen(
         ['git'] + arguments,
@@ -58,7 +58,7 @@ def git(arguments, path):
 
     result = process.communicate()
 
-    if process.returncode != 0:
+    if raise_exception_on_error and process.returncode != 0:
         raise InvalidGitRepositoryError(result[1].decode('utf-8').strip())
 
     return result[0].decode('utf-8')
@@ -211,7 +211,8 @@ def _sweep(argv):
             for ref in ok_to_delete:
                 sys.stdout.write('  deleting {0}'.format(ref))
                 git(['push', remote_name, ':{0}'.format(ref)], path=repo.path)
-                git(['branch', '--delete', ref], path=repo.path)
+                git(['branch', '--delete', ref],
+                    path=repo.path, raise_exception_on_error=False)
                 sys.stdout.write(' (done)\n')
 
             sys.stdout.write('\nAll done!\n')
