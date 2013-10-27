@@ -89,52 +89,43 @@ def master_ref(origin, master_branch, path):
         'Could not find ref for {0}'.format(master_branch))
 
 
-class Inspector(object):
+def merged_refs(repo, remote_name, master_branch, skip):
+    """Return a list of remote refs that have been merged into the master.
 
-    """Used to introspect a Git repository."""
+    The "master" branch may have a different name than master. The value of
+    ``self.master_name`` is used to determine what this name is.
 
-    def __init__(self, repo, remote_name='origin', master_branch='master'):
-        self.repo = repo
-        self.remote_name = remote_name
-        self.master_branch = master_branch
+    """
+    origin = remote_name
 
-    def merged_refs(self, skip):
-        """Return a list of remote refs that have been merged into the master.
+    master = master_ref(origin,
+                        master_branch=master_branch,
+                        path=repo.path)
 
-        The "master" branch may have a different name than master. The value of
-        ``self.master_name`` is used to determine what this name is.
+    refs = filtered_remotes(origin,
+                            skip=['HEAD', master_branch] + skip,
+                            path=repo.path)
+    merged = []
 
-        """
-        origin = self.remote_name
+    for ref in refs:
+        upstream = '{origin}/{master}'.format(
+            origin=origin, master=master)
+        head = '{origin}/{branch}'.format(
+            origin=origin, branch=ref)
+        # Drop to the git binary to do this, it's just easier to work with
+        # at this level.
+        process = subprocess.Popen(
+            ['git', 'cherry', upstream, head],
+            stdin=subprocess.PIPE,
+            cwd=repo.path,
+            stdout=subprocess.PIPE)
+        stdout = process.communicate()[0].decode('utf-8')
+        if process.returncode == 0 and not stdout:
+            # This means there are no commits in the branch that are not
+            # also in the master branch. This is ready to be deleted.
+            merged.append(ref)
 
-        master = master_ref(origin,
-                            master_branch=self.master_branch,
-                            path=self.repo.path)
-
-        refs = filtered_remotes(origin,
-                                skip=['HEAD', self.master_branch] + skip,
-                                path=self.repo.path)
-        merged = []
-
-        for ref in refs:
-            upstream = '{origin}/{master}'.format(
-                origin=origin, master=master)
-            head = '{origin}/{branch}'.format(
-                origin=origin, branch=ref)
-            # Drop to the git binary to do this, it's just easier to work with
-            # at this level.
-            process = subprocess.Popen(
-                ['git', 'cherry', upstream, head],
-                stdin=subprocess.PIPE,
-                cwd=self.repo.path,
-                stdout=subprocess.PIPE)
-            stdout = process.communicate()[0].decode('utf-8')
-            if process.returncode == 0 and not stdout:
-                # This means there are no commits in the branch that are not
-                # also in the master branch. This is ready to be deleted.
-                merged.append(ref)
-
-        return merged
+    return merged
 
 
 def sweep(argv):
@@ -157,17 +148,15 @@ def _sweep(path, args):
                 sys.stdout.write('Fetching from the remote\n')
                 fetch(remote, path)
 
-    master_branch = args.master
-
-    # Find branches that could be merged
-    inspector = Inspector(repo, remote_name=remote_name,
-                          master_branch=master_branch)
-    ok_to_delete = inspector.merged_refs(args.skips)
+    ok_to_delete = merged_refs(repo,
+                               remote_name=remote_name,
+                               master_branch=args.master,
+                               skip=args.skips)
 
     if ok_to_delete:
         sys.stdout.write(
             'These branches have been merged into {0}:\n\n'.format(
-                master_branch))
+                args.master))
     else:
         sys.stdout.write('No remote branches are available for '
                          'cleaning up\n')
