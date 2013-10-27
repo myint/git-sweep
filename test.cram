@@ -24,6 +24,11 @@ Test a minimal example.
     $ git add bar.txt
     $ git commit --quiet --message='Test'
     $ git push --quiet origin bar
+
+    $ "$TESTDIR/git-sweep" --dry-run
+    Fetching from the remote
+    No remote branches are available for cleaning up
+
     $ "$TESTDIR/git-sweep"
     Fetching from the remote
     No remote branches are available for cleaning up

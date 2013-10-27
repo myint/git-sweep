@@ -144,7 +144,9 @@ def _sweep(path, args):
     for ref in ok_to_delete:
         sys.stdout.write('  {0}\n'.format(ref))
 
-    if not args.dry_run:
+    if args.dry_run:
+        sys.stdout.write('\nTo delete them, run again without --dry-run\n')
+    else:
         if not args.force:
             sys.stdout.write('\nDelete these branches? (y/n) ')
             answer = raw_input()
@@ -163,8 +165,6 @@ def _sweep(path, args):
             sys.stdout.write('(you don\'t have to, yours is synced)\n')
         else:
             sys.stdout.write('\nOK, aborting.\n')
-    elif ok_to_delete:
-        sys.stdout.write('\nTo delete them, run again without --dry-run\n')
 
 
 def parse_args(arguments):
