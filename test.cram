@@ -3,7 +3,7 @@
 Test expected failures.
 
     $ "$TESTDIR/git-sweep"
-    Not a valid git repository
+    fatal: Not a git repository (or any of the parent directories): .git
     [1]
 
 Test a minimal example.
