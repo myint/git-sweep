@@ -88,7 +88,7 @@ class Inspector(object):
         self.master_branch = master_branch
 
     def _filtered_remotes(self, origin, skip=None):
-        """Returns a list of remote refs, skipping ones you don't need.
+        """Return a list of remote refs, skipping ones you don't need.
 
         If ``skip`` is empty, it will default to ``['HEAD',
         self.master_branch]``.
@@ -103,7 +103,7 @@ class Inspector(object):
         return refs
 
     def _master_ref(self, origin):
-        """Finds the master ref object that matches master branch."""
+        """Find the master ref object that matches master branch."""
         for head in remote_heads(origin, self.repo.path):
             if head == self.master_branch:
                 return head
@@ -113,7 +113,7 @@ class Inspector(object):
 
     @property
     def _origin(self):
-        """Gets the remote that references origin by name self.origin_name."""
+        """Get the remote that references origin by name self.origin_name."""
         origin = None
 
         for remote in self.repo.remotes():
@@ -127,8 +127,7 @@ class Inspector(object):
         return origin
 
     def merged_refs(self, skip=None):
-        """Returns a list of remote refs that have been merged into the master
-        branch.
+        """Return a list of remote refs that have been merged into the master.
 
         The "master" branch may have a different name than master. The value of
         ``self.master_name`` is used to determine what this name is.
@@ -166,7 +165,7 @@ class Inspector(object):
 
 
 def _sweep(argv):
-    """Runs git-sweep."""
+    """Run git-sweep."""
     args = parse_args(argv[1:])
 
     skips = [i.strip() for i in args.skips.split(',')]
@@ -253,7 +252,7 @@ def parse_args(args):
 
 
 def main():
-    """Runs git-sweep."""
+    """Run git-sweep."""
     try:
         _sweep(sys.argv)
         return 0
