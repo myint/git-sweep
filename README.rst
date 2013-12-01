@@ -8,6 +8,9 @@ git-sweep
 A command-line tool that helps you clean up Git branches that have been merged
 into master.
 
+This is a fork that adds Python 3 support (in addition to Python 2). The
+original is at https://github.com/arc90/git-sweep.
+
 The problem
 -----------
 

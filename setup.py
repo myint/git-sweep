@@ -39,6 +39,7 @@ setup(name='git-sweep3k',
           'Topic :: Software Development :: Version Control',
           'Topic :: Text Processing'
       ],
-      keywords='git maintenance branches',
+      keywords='git, maintenance, branches',
+      url='https://github.com/myint/git-sweep',
       license='MIT',
       scripts=['git-sweep'])
