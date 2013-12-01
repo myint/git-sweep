@@ -21,13 +21,10 @@ def version():
 with open(os.path.join(ROOT, 'README.rst')) as _readme:
     README = _readme.read()
 
-with open(os.path.join(ROOT, 'NEWS.txt')) as _news:
-    NEWS = _news.read()
-
-setup(name='git-sweep',
+setup(name='git-sweep3k',
       version=version(),
       description='Clean up branches from your Git remotes',
-      long_description=README + '\n\n' + NEWS,
+      long_description=README,
       classifiers=[
           'Development Status :: 4 - Beta',
           'Environment :: Console',
@@ -43,8 +40,5 @@ setup(name='git-sweep',
           'Topic :: Text Processing'
       ],
       keywords='git maintenance branches',
-      author='Arc90, Inc.',
-      author_email='',
-      url='http://arc90.com',
       license='MIT',
       scripts=['git-sweep'])
