@@ -62,7 +62,7 @@ def filtered_remotes(origin, skip, path):
 
     """
     return [head for head in remote_heads(origin, path)
-            if not head in skip]
+            if head not in skip]
 
 
 def master_ref(origin, master_branch, path):
