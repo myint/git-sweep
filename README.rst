@@ -1,7 +1,7 @@
 git-sweep
 =========
 
-.. image:: https://travis-ci.org/myint/git-sweep.png?branch=master
+.. image:: https://travis-ci.org/myint/git-sweep.svg?branch=master
    :target: https://travis-ci.org/myint/git-sweep
    :alt: Build status
 
