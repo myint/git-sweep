@@ -7,7 +7,7 @@ check:
 		--disable=no-member \
 		git-sweep setup.py
 	check-manifest
-	python setup.py --long-description | rst2html.py --strict > /dev/null
+	python setup.py --long-description | rstcheck -
 	scspell setup.py README.rst
 
 readme:
