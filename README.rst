@@ -28,11 +28,9 @@ The answer
 Using ``git-sweep`` you can **safely remove remote branches that have been
 merged into master**.
 
-To install it run:
+To install it run::
 
-::
-
-    pip install git+https://github.com/myint/git-sweep
+    $ pip install git-sweep3k
 
 Try it for yourself (safely)
 ----------------------------
@@ -40,9 +38,7 @@ Try it for yourself (safely)
 To see a list of branches that git-sweep detects are merged into your master
 branch:
 
-The ``--dry-run`` option doesn't make any changes to your repo.
-
-::
+The ``--dry-run`` option doesn't make any changes to your repository::
 
     $ git sweep --dry-run
     Fetching from the remote
@@ -57,9 +53,7 @@ The ``--dry-run`` option doesn't make any changes to your repo.
     To delete them, run again without --dry-run
 
 If you are happy with the list, you can run the command that deletes these
-branches from the remote:
-
-::
+branches from the remote::
 
     $ git sweep
     Fetching from the remote
@@ -85,16 +79,12 @@ branches from the remote:
 
 *Note: this can take a little time, it's talking over the tubes to the remote.*
 
-You can also give it a different name for your remote and master branches.
-
-::
+You can also give it a different name for your remote and master branches::
 
     $ git sweep --dry-run --master=develop --origin=github
     ...
 
-Tell it to skip the ``git fetch`` that it does by default.
-
-::
+Tell it to skip the ``git fetch`` that it does by default::
 
     $ git sweep --dry-run --no-fetch
     These branches have been merged into master:
@@ -103,9 +93,7 @@ Tell it to skip the ``git fetch`` that it does by default.
 
     To delete them, run again without --dry-run
 
-Make it skip certain branches.
-
-::
+Make it skip certain branches::
 
     $ git sweep --dry-run --skip=develop
     Fetching from the remote
@@ -117,16 +105,12 @@ Make it skip certain branches.
     To delete them, run again without --dry-run
 
 Once git-sweep finds the branches, you'll be asked to confirm that you wish to
-delete them.
-
-::
+delete them::
 
     Delete these branches? (y/n)
 
 You can use the ``--force`` option to bypass this and start deleting
-immediately.
-
-::
+immediately::
 
     $ git sweep --skip=develop --force
     Fetching from the remote
