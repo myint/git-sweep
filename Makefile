@@ -2,7 +2,7 @@ check:
 	pep8 git-sweep setup.py
 	pylint \
 		--rcfile=/dev/null \
-		--report=no \
+		--reports=no \
 		--disable=invalid-name \
 		--disable=no-member \
 		git-sweep setup.py
